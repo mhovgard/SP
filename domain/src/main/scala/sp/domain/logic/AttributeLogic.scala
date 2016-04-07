@@ -61,10 +61,13 @@ trait AttributeLogics {
       SPAttributes(m)
     }
     def +(kv: (String, Any))(implicit formats : org.json4s.Formats) = {
-      SPAttributes(obj :+ kv._1->Extraction.decompose(kv._2))
+      val newObj = obj.filter(_._1 != kv._1)
+      SPAttributes(newObj :+ kv._1->Extraction.decompose(kv._2))
     }
     def +(xs: JObject) = {
-      SPAttributes(obj ++ xs.obj)
+      val keys = xs.values.keySet
+      val newObj = obj.filter(x => !keys.contains(x._1))
+      SPAttributes(newObj ++ xs.obj)
     }
 
     def dig[T](keys: String*)(implicit formats : org.json4s.Formats, mf : scala.reflect.Manifest[T]): Option[T] = {
