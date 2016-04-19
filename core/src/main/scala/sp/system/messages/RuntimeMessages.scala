@@ -22,10 +22,13 @@ case class StopRuntime(runtime: ID)
 case class RuntimeInfo(id: ID, kind: String, model: ID, name: String, settings: Option[SPAttributes])
 case class RuntimeInfos(runtimes: List[RuntimeInfo])
 
-// Messages to talk to various runtimes
+
+
+// Messages to and from runtimes
 trait RuntimeMessage {
   val runtime: ID
 }
 
 case class SimpleMessage(runtime: ID, attributes: SPAttributes) extends RuntimeMessage
+case class IDAbleRuntimeMessage(runtime: ID, ids: List[IDAble], attributes: SPAttributes)
 

@@ -20,7 +20,7 @@ class ModelingTester(mh: ActorRef) extends Actor with MyModel {
       import model._
 
       items.o1.copy(weird = items.o1.weird.copy(tomte = true))
-
+      items.hV.o1
   }
 
 }
@@ -60,6 +60,17 @@ trait MyModel {
 
 }
 
+trait SimpleModeling {
+  val ids: List[IDAble]
+  val idMap = ids.map(i => i.id -> i).toMap
+  val v1 = idMap(ID.makeID("74023bf0-273c-4824-a0f7-9e7274950887").get).asInstanceOf[Thing]
+  val v1_2 = idMap(ID.makeID("c43b570f-00cf-49c8-b479-63e8fada246c").get).asInstanceOf[Thing]
+  val v2 = idMap(ID.makeID("fe072e2c-eb43-4774-bbc5-7714652ce1c8").get).asInstanceOf[Thing]
+  val o1 = idMap(ID.makeID("3957b439-8fe7-4d7a-a884-93cd9aa030ce").get).asInstanceOf[Operation]
+  val o2 = idMap(ID.makeID("7eca3e51-c625-49f1-9379-f67e62ddb753").get).asInstanceOf[Operation]
+  val h = idMap(ID.makeID("c17d5838-4bfa-4a1c-b58b-38269bf133a1").get).asInstanceOf[HierarchyRoot]
+}
+
 abstract class MyModeling {
   val ids: List[IDAble]
   val idMap = ids.map(i => i.id -> i).toMap
@@ -70,12 +81,7 @@ abstract class MyModeling {
   val itemO2 = idMap(ID.makeID("7eca3e51-c625-49f1-9379-f67e62ddb753").get).asInstanceOf[Operation]
   val itemH = idMap(ID.makeID("c17d5838-4bfa-4a1c-b58b-38269bf133a1").get).asInstanceOf[HierarchyRoot]
 
-
-
-
   trait IDAbleModel {def toIDAble: IDAble}
-
-
 
   case class V1Class(name: String, id: ID, attributes: SPAttributes, initial: Boolean) extends IDAbleModel {
     val attr = attributes + ("initial"->initial)
@@ -132,6 +138,13 @@ abstract class MyModeling {
     val time_30 = 30
   }
 
+  case object HValues {
+    val id = itemH.id
+    val id_c17d5838_4bfa_4a1c_b58b_38269bf133a1 = "c17d5838-4bfa-4a1c-b58b-38269bf133a1"
+    val o1 = {case object obj {val v1 = "något"}; obj}
+    val o2 = {case object obj {val v2 = "något"}; obj}
+  }
+
   case object items{
     val v1 = V1Class(name = itemV1.name, id = itemV1.id, attributes = itemV1.attributes, initial = false)
     val v1V = V1Values
@@ -143,7 +156,10 @@ abstract class MyModeling {
     val o1V = O1Values
     val o2 = O2Class(name = itemO2.name, id = itemO2.id, attributes = itemO2.attributes, conditions = itemO2.conditions, time = 30)
     val o2V = O2Values
+    val h = itemH
+    val hV = HValues
   }
+
 
 
   case object operations {
@@ -165,44 +181,6 @@ abstract class MyModeling {
 
 
 
-  case object _V1_2Initial{val value_false = false}
-  //  case object _V1_2ID{val value_c43b570f_00cf_49c8_b479_63e8fada246c = "c43b570f-00cf-49c8-b479-63e8fada246c"}
-  //  case object _V1_2Name{val v1_2 = "v1_2"}
-  //  case object V1_2{
-  //    val id = itemV1_2.id
-  //    val idV = _V1_2ID
-  //    val name = itemV1_2.name
-  //    val nameV = _V1_2Name
-  //    val attributes = itemV1_2.attributes
-  //    val initial = false
-  //    val initialV = _V1_2Initial
-  //  }
-  //
-  //  case object _V2Initial{val value_false = false}
-  //  case object _V2ID{val value_74023bf0_273c_4824_a0f7_9e7274950887 = "74023bf0-273c-4824-a0f7-9e7274950887"}
-  //  case object _V2Name{val v2 = "v2"}
-  //  case object V2{
-  //    val id = itemV2.id
-  //    val idV = _V2ID
-  //    val name = itemV2.name
-  //    val nameV = _V2Name
-  //    val attributes = itemV2.attributes
-  //    val initial = false
-  //    val initialV = _V2Initial
-  //  }
-  //
-  //  case object _O2Initial{val value_false = false}
-  //  case object _O2ID{val value_7eca3e51_c625_49f1_9379_f67e62ddb753 = "7eca3e51-c625-49f1-9379-f67e62ddb753"}
-  //  case object _O2Name{val o2 = "o2"}
-  //  case object O2{
-  //    val id = itemO2.id
-  //    val idV = _O2ID
-  //    val name = itemO2.name
-  //    val nameV = _O2Name
-  //    val attributes = itemO2.attributes
-  //    val initial = false
-  //    val initialV = _O2Initial
-  //  }
 
 
 
