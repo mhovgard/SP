@@ -1,7 +1,49 @@
 
 import sp.domain._
+import sp.psl.AbilityStructure
 
 class operationMaker {
+
+  val listOfPickUp = for {
+    a <- 1 to 2
+    b <- 1 to 8
+  } yield {
+    Operation(s"pickCube$a$b",List(), SPAttributes("ability" -> AbilityStructure("r4.pickblock.run", Some(a*10+b))))
+  }
+
+
+  var placeCube: List[Operation]
+  for(a <-1 to 4){
+    for(b <-1 to 4) {
+      placeCube ++ List(Operation("r4.mode.run", ))
+    }
+  }
+  var SOP = SOP()
+
+
+  def makeSOP(ls: List[List[String]]): Unit = {
+    SOP = SOP(Sequence())
+  }
+
+  def getStartOperation(): List[Operation] = {
+    List[Operation](OR2PlaceBuildingPalett, OR2PalettToR4PalettSpace1, OR2PalettToR4PalettSpace2)
+  }
+
+  def getEndOperations(): List[Operation] = {
+    List[Operation](OR2RemoveBuildingPalett, OR2PalettRemoveR4PalettSpace1, OR2PalettRemoveR4PalettSpace2)
+  }
+
+  def getCubePlacingOperations(ls: List[List[String]]): List[Operation] = {
+    val list = List[Operation]();
+    for (a <- 0 to 3) {
+      for (b <- 0 to 3) {
+        if (ls(a)(b).toInt > 0) {
+          list :: List(OR4PickUpAt11)
+        }
+      }
+    }
+    list
+  }
 
 //For palettpos1
   val R4BuildSpace1Book = Thing("R4BuildSpace1Booked")

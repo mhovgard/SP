@@ -12,7 +12,7 @@ import sp.domain.Logic._
 import sp.domain.Operation
 import com.typesafe.config._
 
-
+case class AbilityStructure(name: String, hej: Option[Int])
 
 object PSLModel extends SPService {
   val specification = SPAttributes(
