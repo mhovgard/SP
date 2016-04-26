@@ -45,6 +45,8 @@ class operationMaker {
     list
   }
 
+class operationMaker {
+
 //For palettpos1
   val R4BuildSpace1Book = Thing("R4BuildSpace1Booked")
 //For palettpos2
@@ -497,20 +499,7 @@ class operationMaker {
   val OR5PutCubeAt44 = Operation("OR5PutCubeAt44", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5HoldingCube)), List(aListOfPutDownCubes(16),aR5NotHoldingCube))))
 
 // val sopSeq = SOP(Sequence(o11, o12, o13), Sequence(o21, o22, o23), Parallel(o11,o12))
-  val thaSop = SOP(
-    Sequence(
-        OR2PlaceBuildingPalett,OR2PalettToR4PalettSpace1, OR2PalettToR4PalettSpace2,OR4PickUpAt15,OR4PutCubeAt12,
-        OR4PickUpAt11,OR4PutCubeAt11, OR4PickUpAt17,OR4PutCubeAt12,OR4PickUpAt12, OR4PutCubeAt21,OR4PickUpAt17,
-        OR4PutCubeAt32,OR4PickUpAt13,OR4PutCubeAt31,OR4PickUpAt18,OR4PutCubeAt42, OR4PickUpAt14,OR4PutCubeAt41,
-        OR4PickUpAt11,OR4PutCubeAt13,OR4PickUpAt15,OR4PutCubeAt14,OR4PickUpAt12, OR4PutCubeAt23,OR4PickUpAt16,
-        OR4PutCubeAt24,OR4PickUpAt13,OR4PutCubeAt33,OR4PickUpAt17,OR4PutCubeAt34, OR4PickUpAt14,OR4PutCubeAt43,
-        OR4PickUpAt18,OR4PutCubeAt44,OR2RemoveBuildingPalett, OR2PalettRemoveR4PalettSpace1,
-        OR2PalettRemoveR4PalettSpace2
-    )
-  //Here is were the next tower would be.
-  )
-//(operation = f), indicates finished
-}
+
 
 /*
 

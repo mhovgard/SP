@@ -218,7 +218,6 @@ object SP extends App {
   )
 
 
-
   import sp.TobbeG._
   serviceHandler ! RegisterService(
     "TobbeG",
@@ -241,6 +240,14 @@ object SP extends App {
     operatorService.specification,
     operatorService.transformation
   )
+  serviceHandler ! RegisterService(
+    "VariableOperationMapper",
+    system.actorOf(VariableOperationMapper.props, "VariableOperationMapper"),
+    VariableOperationMapper.specification,
+    VariableOperationMapper.transformation
+  )
+
+
 
   // launch REST API
   sp.server.LaunchGUI.launch
