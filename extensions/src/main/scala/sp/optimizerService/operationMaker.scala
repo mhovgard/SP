@@ -4,7 +4,7 @@ import sp.psl.AbilityStructure
 
 class operationMaker {
 
-  //Vals for makeing Thnigs
+  // Valuerestrictions for the robots. 
   val fixturePlaces = 8
   val towerRows = 4
   val towerCols = 4
@@ -48,11 +48,49 @@ class operationMaker {
         )
 
   }
-  val listOfPutDownR4 = listOfPutDownAll.filter(_._1 == rs(1))
-  val listOfPutDownR5 = listOfPutDownAll.filter(_._1 == rs(2))
+  val r4listOfPutDown = listOfPutDownAll.filter(_._1 == rs(1))
+  val r5listOfPutDown = listOfPutDownAll.filter(_._1 == rs(2))
+
+  val r4ToDodge = Operation("r4ToDodge", List(), SPAttributes("ability" -> AbilityStructure("R4.toDodge.run", Some(-1))) // när man ska lyfta in paletter måste de stå i dodgeläge
+  val r5ToDodge = Operation("r4ToDodge", List(), SPAttributes("ability" -> AbilityStructure("R5.toDodge.run", Some(-1)))
+  val r4ToHome = Operation("r4ToHome", List(), SPAttributes("ability" -> AbilityStructure("R4.toHome.run", Some(-1)))
+  val r5ToHome = Operation("r5ToHome", List(), SPAttributes("ability" -> AbilityStructure("R5.toHome.run", Some(-1)))
+
+
+  val r2listOfplaceAtPos = for {
+    x <- 1 to 5
+    } yield {
+      Operation(s"r2PlaceAtPos$x", List(), SPAttributes("ability" -> AbilityStructure("R2.placeAtPos.run", Some(x))))
+    }
+  val r2listpickAtPos = for {
+    x <- 1 to 5
+    } yield {
+      Operation(s"r2PickAtPos$x", List(), SPAttributes("ability" -> AbilityStructure("R2.pickAtPos.run", Some(x))))
+    }
+
+
+  val r2elevatorStn2ToHomeTable = Operation("r2elevatorStn2ToHomeTable", List(), SPAttributes("ability" -> AbilityStructure("R2.elevatorStn2ToHomeTable.run", Some(-1))))
+  val r2homeTableToElevatorStn3 = Operation("r2homeTableToElevatorStn3", List(), SPAttributes("ability" -> AbilityStructure("R2.homeTableToElevatorStn3.run", Some(-1))))
+  val r2homeTableToHomeBP = Operation("r2homeTableToHomeBP", List(), SPAttributes("ability" -> AbilityStructure("R2.homeTableToHomeBP.run", Some(-1))))
+  val r2homeBPToHomeTable = Operation("r2homeBPToHomeTable", List(), SPAttributes("ability" -> AbilityStructure("R2.homeBPToHomeTable.run", Some(-1))))
+
+
+  // Operations for flexlink
+  // "R2.placeAtPos.run"
+
+
+// Operation("h2", List(), SPAttributes("ability"-> AbilityStructure("h2.up.run", Some(-1))))
+// askAService(Request(operationController, SPAttributes("command"->SPAttributes("commandType"->"execute", "execute"->id))),serviceHandler)
+
 
 //  var SOP = SOP()
 
+
+  
+  val startSequence = Parallel(Sequence(o1, Sequence(o2, o3), o4))
+
+
+  }
 
   def makeSOP(ls: List[List[String]]): Unit = {
     SOP = SOP(Sequence())
