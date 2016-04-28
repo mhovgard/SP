@@ -11,13 +11,13 @@ class operationMaker {
     Operation(s"pickCube$a$b",List(), SPAttributes("ability" -> AbilityStructure("r4.pickblock.run", Some(a*10+b))))
   }
 
-
-  var placeCube: List[Operation]
-  for(a <-1 to 4){
-    for(b <-1 to 4) {
-      placeCube ++ List(Operation("r4.mode.run", ))
-    }
+  val listOfPlaceCube :List[(Operation,Operation)] = for {
+  a <- 1 to 4
+  b <- 1 to 4
+  } yield {
+   Operation(s"placeCube$a$b", List(),SPAttributes("ability" -> AbilityStructure("r4.placeblock.run", Some("R4.placeblock.pos", a*10+b))) )
   }
+
   var SOP = SOP()
 
 
@@ -38,7 +38,7 @@ class operationMaker {
     for (a <- 0 to 3) {
       for (b <- 0 to 3) {
         if (ls(a)(b).toInt > 0) {
-          list :: List(OR4PickUpAt11)
+          list :: List(listOfPickUp(a*b) :: List(listOfPlaceCube(a*b)))
         }
       }
     }
