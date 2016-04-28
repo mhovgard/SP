@@ -4,12 +4,57 @@ import sp.psl.AbilityStructure
 
 class operationMaker {
 
-  val listOfPickUp = for {
-    a <- 1 to 2
-    b <- 1 to 8
-  } yield {
-    Operation(s"pickCube$a$b",List(), SPAttributes("ability" -> AbilityStructure("r4.pickblock.run", Some(a*10+b))))
+  // Valuerestrictions for the robots. 
+  val fixturePlaces = 8
+  val towerRows = 4
+  val towerCols = 4
+  val r4ReachablePalette = List(1,2,3,4)
+  val r5ReachablePalette = List(3,4)     // r4 kommer åt alla. r5 kommer åt 3 och 4
+  val rs = List("R4", "R5")
+  val opNamePickedUpCubes = "PickedUpCubes"
+  val putDownCube = "PutDownCube"
+  val pickCube = "pickCube"
+  val opPickCube = 200
+  val opPlaceCube = 100
+
+
+  val r4listOfPickUp = for {
+      r <- rs(1)
+      x <- r4ReachablePalette
+      a <- 1 to fixturePlaces
+    } yield { 
+      Operation(s"$r$pickCube$x$a",List(), SPAttributes("ability" -> AbilityStructure(s"$r"+".pickBlock.run", Some(opPickCube+x*10+a))))
+    }
+  
+  val r5listOfPickUp = for {
+      r <- rs(2)
+      x <- r5ReachablePalette
+      a <- 1 to fixturePlaces
+    } yield { 
+      Operation(s"$r$pickCube$x$a",List(), SPAttributes("ability" -> AbilityStructure(s"$r"+".pickBlock.run", Some(opPickCube+x*10+a))))
+    }
+
+
+
+
+
+  val listOfPutDownAll = for {
+      r <- rs
+      a <- 1 to towerRows
+      b <- 1 to towerCols
+      } yield {
+        (s"$r",
+        Operation(s"$r$putDownCube$a$b", List(), SPAttributes("ability" -> AbilityStructure(s"$r"+".placeBlock.run", Some(opPlaceCube+10*a+b))))
+        )
+
   }
+  val r4listOfPutDown = listOfPutDownAll.filter(_._1 == rs(1))
+  val r5listOfPutDown = listOfPutDownAll.filter(_._1 == rs(2))
+
+  val r4ToDodge = Operation("r4ToDodge", List(), SPAttributes("ability" -> AbilityStructure("R4.toDodge.run", Some(-1))) // när man ska lyfta in paletter måste de stå i dodgeläge
+  val r5ToDodge = Operation("r4ToDodge", List(), SPAttributes("ability" -> AbilityStructure("R5.toDodge.run", Some(-1)))
+  val r4ToHome = Operation("r4ToHome", List(), SPAttributes("ability" -> AbilityStructure("R4.toHome.run", Some(-1)))
+  val r5ToHome = Operation("r5ToHome", List(), SPAttributes("ability" -> AbilityStructure("R5.toHome.run", Some(-1)))
 
   val listOfPlaceCube :List[(Operation,Operation)] = for {
   a <- 1 to 4
@@ -20,6 +65,39 @@ class operationMaker {
 
   var SOP = SOP()
 
+  val r2listOfplaceAtPos = for {
+    x <- 1 to 5
+    } yield {
+      Operation(s"r2PlaceAtPos$x", List(), SPAttributes("ability" -> AbilityStructure("R2.placeAtPos.run", Some(x))))
+    }
+  val r2listpickAtPos = for {
+    x <- 1 to 5
+    } yield {
+      Operation(s"r2PickAtPos$x", List(), SPAttributes("ability" -> AbilityStructure("R2.pickAtPos.run", Some(x))))
+    }
+
+  val r2elevatorStn2ToHomeTable = Operation("r2elevatorStn2ToHomeTable", List(), SPAttributes("ability" -> AbilityStructure("R2.elevatorStn2ToHomeTable.run", Some(-1))))
+  val r2homeTableToElevatorStn3 = Operation("r2homeTableToElevatorStn3", List(), SPAttributes("ability" -> AbilityStructure("R2.homeTableToElevatorStn3.run", Some(-1))))
+  val r2homeTableToHomeBP = Operation("r2homeTableToHomeBP", List(), SPAttributes("ability" -> AbilityStructure("R2.homeTableToHomeBP.run", Some(-1))))
+  val r2homeBPToHomeTable = Operation("r2homeBPToHomeTable", List(), SPAttributes("ability" -> AbilityStructure("R2.homeBPToHomeTable.run", Some(-1))))
+
+
+  // Operations for flexlink
+  // "R2.placeAtPos.run"
+
+
+// Operation("h2", List(), SPAttributes("ability"-> AbilityStructure("h2.up.run", Some(-1))))
+// askAService(Request(operationController, SPAttributes("command"->SPAttributes("commandType"->"execute", "execute"->id))),serviceHandler)
+
+
+//  var SOP = SOP()
+
+
+  
+  val startSequence = Parallel(Sequence(o1, Sequence(o2, o3), o4))
+
+
+  }
 
   def makeSOP(ls: List[List[String]]): Unit = {
     SOP = SOP(Sequence())
@@ -92,14 +170,7 @@ class operationMaker {
 //Things for status of Build spot
 
 
-//Vals for makeing Thnigs
-  val fixtNo = 2
-  val posFix = 8
-  val row = 4
-  val col = 4
-  val rs = List("R4", "R5")
-  val opNamePickedUpCubes = "PickedUpCubes"
-  val opNamePutDownCubes = "PutDownCubes"
+
 
 //Makes Things for PickUpCubes
   val listOfPickedUpCubes = for {
@@ -117,89 +188,6 @@ class operationMaker {
   } yield {
     Thing(s"$opNamePutDownCubes$f$p")
   }
-
-//  val R2PalettToR5Pos1 = Thing("R2PalettToR5Pos1")
-//  val R2PalettToR5Pos2 = Thing("R2PalettToR5Pos2")
-//  val R2PalettToR4Pos1 = Thing("R2PalletToR4Pos1")
-//  val R2PalettToR4Pos2 = Thing("R2PalettToR4Pos2")
-//  val R2PalettRemoveR5Pos1 = Thing("R2PalettRemoveR5Pos1")
-//  val R2PalettRemoveR5Pos2 = Thing("R2PalettRemoveR5Pos2")
-//  val R2PalettRemoveR4Pos1 = Thing("R2PalettRemoveR4Pos1")
-//  val R2PalettRemoveR4Pos2 = Thing("R2PalettRemoveR4Pos2")
-//  val R2PlaceBuildingPalett = Thing("R2PlaceBuildingPalett")
-//  val R2RemoveBuildingPalett = Thing("R2RemoveBuildingPalett")
-
-//discribes at which pallet (first diget) and position (seconde diget) R4 picks up
-//  val R4PickUpAt: List[Thing] = R4PickUpAt + rR2 = Thing("R4PickUpAt + rR2")
-//  val R4PickUpAt11 = Thing("R4PickUpAt11")
-//  val R4PickUpAt12 = Thing("R4PickUpAt12")
-//  val R4PickUpAt13 = Thing("R4PickUpAt13")
-//  val R4PickUpAt14 = Thing("R4PickUpAt14")
-//  val R4PickUpAt15 = Thing("R4PickUpAt15")
-//  val R4PickUpAt16 = Thing("R4PickUpAt16")
-//  val R4PickUpAt17 = Thing("R4PickUpAt17")
-//  val R4PickUpAt18 = Thing("R4PickUpAt18")
-//  //discribes at which pallet (first diget) and position (seconde diget) R4 picks up
-//  val R4PickUpAt21 = Thing("R4PickUpAt21")
-//  val R4PickUpAt22 = Thing("R4PickUpAt22")
-//  val R4PickUpAt23 = Thing("R4PickUpAt23")
-//  val R4PickUpAt24 = Thing("R4PickUpAt24")
-//  val R4PickUpAt25 = Thing("R4PickUpAt25")
-//  val R4PickUpAt26 = Thing("R4PickUpAt26")
-//  val R4PickUpAt27 = Thing("R4PickUpAt27")
-//  val R4PickUpAt28 = Thing("R4PickUpAt28")
-//  //discribes at which pallet (first diget) and position (seconde diget) R5 picks up
-//  val R5PickUpAt11 = Thing("R4PickUpAt11")
-//  val R5PickUpAt12 = Thing("R4PickUpAt12")
-//  val R5PickUpAt13 = Thing("R4PickUpAt13")
-//  val R5PickUpAt14 = Thing("R4PickUpAt14")
-//  val R5PickUpAt15 = Thing("R4PickUpAt15")
-//  val R5PickUpAt16 = Thing("R4PickUpAt16")
-//  val R5PickUpAt17 = Thing("R4PickUpAt17")
-//  val R5PickUpAt18 = Thing("R4PickUpAt18")
-//  //discribes at which pallet (first diget) and position (seconde diget) R5 picks up
-//  val R5PickUpAt21 = Thing("R4PickUpAt21")
-//  val R5PickUpAt22 = Thing("R4PickUpAt22")
-//  val R5PickUpAt23 = Thing("R4PickUpAt23")
-//  val R5PickUpAt24 = Thing("R4PickUpAt24")
-//  val R5PickUpAt25 = Thing("R4PickUpAt25")
-//  val R5PickUpAt26 = Thing("R4PickUpAt26")
-//  val R5PickUpAt27 = Thing("R4PickUpAt27")
-//  val R5PickUpAt28 = Thing("R4PickUpAt28")
-//Discrabes things were R4 can put cubes
-//  val R4PutCubeAt11 = Thing("R4PutCubeAt11")
-//  val R4PutCubeAt12 = Thing("R4PutCubeAt12")
-//  val R4PutCubeAt13 = Thing("R4PutCubeAt13")
-//  val R4PutCubeAt14 = Thing("R4PutCubeAt14")
-//  val R4PutCubeAt21 = Thing("R4PutCubeAt21")
-//  val R4PutCubeAt22 = Thing("R4PutCubeAt22")
-//  val R4PutCubeAt23 = Thing("R4PutCubeAt23")
-//  val R4PutCubeAt24 = Thing("R4PutCubeAt24")
-//  val R4PutCubeAt31 = Thing("R4PutCubeAt31")
-//  val R4PutCubeAt32 = Thing("R4PutCubeAt32")
-//  val R4PutCubeAt33 = Thing("R4PutCubeAt33")
-//  val R4PutCubeAt34 = Thing("R4PutCubeAt34")
-//  val R4PutCubeAt41 = Thing("R4PutCubeAt41")
-//  val R4PutCubeAt42 = Thing("R4PutCubeAt42")
-//  val R4PutCubeAt43 = Thing("R4PutCubeAt43")
-//  val R4PutCubeAt44 = Thing("R4PutCubeAt44")
-//  //Discrabes things were R5 can put cubes
-//  val R5PutCubeAt11 = Thing("R5PutCubeAt11")
-//  val R5PutCubeAt12 = Thing("R5PutCubeAt12")
-//  val R5PutCubeAt13 = Thing("R5PutCubeAt13")
-//  val R5PutCubeAt14 = Thing("R5PutCubeAt14")
-//  val R5PutCubeAt21 = Thing("R5PutCubeAt21")
-//  val R5PutCubeAt22 = Thing("R5PutCubeAt22")
-//  val R5PutCubeAt23 = Thing("R5PutCubeAt23")
-//  val R5PutCubeAt24 = Thing("R5PutCubeAt24")
-//  val R5PutCubeAt31 = Thing("R5PutCubeAt31")
-//  val R5PutCubeAt32 = Thing("R5PutCubeAt32")
-//  val R5PutCubeAt33 = Thing("R5PutCubeAt33")
-//  val R5PutCubeAt34 = Thing("R5PutCubeAt34")
-//  val R5PutCubeAt41 = Thing("R5PutCubeAt41")
-//  val R5PutCubeAt42 = Thing("R5PutCubeAt42")
-//  val R5PutCubeAt43 = Thing("R5PutCubeAt43")
-//  val R5PutCubeAt44 = Thing("R5PutCubeAt44")
 
 
 //Iniate parsers--------------------------------------------------------------------------------------------------------
