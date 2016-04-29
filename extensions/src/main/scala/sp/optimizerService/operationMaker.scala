@@ -60,10 +60,10 @@ object operationMaker extends SPService {
   val r4listOfPutDown = listOfPutDownAll.filter(_._1 == rs(1)).unzip._2
   val r5listOfPutDown = listOfPutDownAll.filter(_._1 == rs(2)).unzip._2
 
-  val r4toDodge = Operation("R4toDodge", List(), SPAttributes("ability" -> AbilityStructure("R4.toDodge.run", Some("R4.toDodge.run", -1)))) // när man ska lyfta in paletter måste de stå i dodgeläge
-  val r5toDodge = Operation("R4toDodge", List(), SPAttributes("ability" -> AbilityStructure("R5.toDodge.run", Some("R5.toDodge.run", -1))))
-  val r4toHome = Operation("R5toHome", List(), SPAttributes("ability" -> AbilityStructure("R4.toHome.run", Some("R4.toDodge.run", -1))))
-  val r5toHome = Operation("R5toHome", List(), SPAttributes("ability" -> AbilityStructure("R5.toHome.run", Some("R5.toDodge.run", -1))))
+  val r4toDodge = Operation("R4toDodge", List(), SPAttributes("ability" -> AbilityStructure("R4.toDodge.run", None))) // när man ska lyfta in paletter måste de stå i dodgeläge
+  val r5toDodge = Operation("R4toDodge", List(), SPAttributes("ability" -> AbilityStructure("R5.toDodge.run", None)))
+  val r4toHome = Operation("R5toHome", List(), SPAttributes("ability" -> AbilityStructure("R4.toHome.run", None)))
+  val r5toHome = Operation("R5toHome", List(), SPAttributes("ability" -> AbilityStructure("R5.toHome.run", None)))
 
 // X = 5 flytta in till byggplatsen
   val r2listOfplaceAtPos = for {
@@ -78,17 +78,17 @@ object operationMaker extends SPService {
     }
 
 
-  val r2elevatorStn2ToHomeTable = Operation("r2elevatorStn2ToHomeTable", List(), SPAttributes("ability" -> AbilityStructure("R2.elevatorStn2ToHomeTable.run", Some("R2.elevatorStn2ToHomeTable.run",-1))))
-  val r2homeTableToElevatorStn3 = Operation("r2homeTableToElevatorStn3", List(), SPAttributes("ability" -> AbilityStructure("R2.homeTableToElevatorStn3.run", Some("R2.homeTableToElevatorStn3.run",-1))))
-  val r2homeTableToHomeBP = Operation("r2homeTableToHomeBP", List(), SPAttributes("ability" -> AbilityStructure("R2.homeTableToHomeBP.run", Some("R2.homeTableToHomeBP.run",-1))))
-  val r2homeBPToHomeTable = Operation("r2homeBPToHomeTable", List(), SPAttributes("ability" -> AbilityStructure("R2.homeBPToHomeTable.run", Some("R2.homeBPToHomeTable.run",-1))))
+  val r2elevatorStn2ToHomeTable = Operation("r2elevatorStn2ToHomeTable", List(), SPAttributes("ability" -> AbilityStructure("R2.elevatorStn2ToHomeTable.run", None)))
+  val r2homeTableToElevatorStn3 = Operation("r2homeTableToElevatorStn3", List(), SPAttributes("ability" -> AbilityStructure("R2.homeTableToElevatorStn3.run", None)))
+  val r2homeTableToHomeBP = Operation("r2homeTableToHomeBP", List(), SPAttributes("ability" -> AbilityStructure("R2.homeTableToHomeBP.run", None)))
+  val r2homeBPToHomeTable = Operation("r2homeBPToHomeTable", List(), SPAttributes("ability" -> AbilityStructure("R2.homeBPToHomeTable.run", None)))
 
 
       //test
-  val h2Up = Operation("h2.up.run", List(), SPAttributes("ability"-> AbilityStructure("h2.up.run", Some("h2.up.run",-1))))
-  val h2Down= Operation("h2.down.run", List(), SPAttributes("ability"-> AbilityStructure("h2.down.run", Some("h2.down.run",-1))))
-  val h3Up = Operation("h3.up.run", List(), SPAttributes("ability"-> AbilityStructure("h3.up.run", Some("h3.up.run",-1))))
-  val h3Down = Operation("h3.down.run", List(), SPAttributes("ability"-> AbilityStructure("h3.down.run", Some("h3.down.run",-1))))
+  val h2Up = Operation("h2.up.run", List(), SPAttributes("ability"-> AbilityStructure("h2.up.run", None)))
+  val h2Down= Operation("h2.down.run", List(), SPAttributes("ability"-> AbilityStructure("h2.down.run", None)))
+  val h3Up = Operation("h3.up.run", List(), SPAttributes("ability"-> AbilityStructure("h3.up.run", None)))
+  val h3Down = Operation("h3.down.run", List(), SPAttributes("ability"-> AbilityStructure("h3.down.run", None)))
 
 
   
