@@ -15,7 +15,7 @@ import sp.domain.Operation
 import com.typesafe.config._
 
 
-object operationMaker extends SPService {
+object operationMaker {
 
   // Valuerestrictions for the robots. 
   val fixturePlaces = 8
@@ -27,19 +27,23 @@ object operationMaker extends SPService {
   val opNamePickedUpCubes = "pickedUpCubes"
 
 
-  val r4listOfPickUp = for {
-      r <- rs(1)
-      x <- r4ReachablePalette
-      a <- 1 to fixturePlaces
-    } yield { 
+  val r4listOfPickUp = for
+  {
+    r <- rs(1);
+    x <- r4ReachablePalette;
+    a <- 1 to fixturePlaces
+  }
+    yield {
       Operation(s"$r"+s"pickCube$x$a",List(), SPAttributes("ability" -> AbilityStructure(s"$r"+".pickBlock.run", Some(s"$r"+".pickBlock.pos",x*10+a))))
     }
   
-  val r5listOfPickUp = for {
-      r <- rs(2)
-      x <- r5ReachablePalette
-      a <- 1 to fixturePlaces
-    } yield { 
+  val r5listOfPickUp = for
+  {
+    r <- rs(2);
+    x <- r5ReachablePalette;
+    a <- 1 to fixturePlaces
+  }
+    yield {
       Operation(s"$r"+s"pickCube$x$a",List(), SPAttributes("ability" -> AbilityStructure(s"$r"+".pickBlock.run", Some(s"$r"+".pickBlock.pos",x*10+a))))
     }
 
@@ -47,11 +51,11 @@ object operationMaker extends SPService {
 
 
 // Finns inte definierade på detta sätt för R5
-  val listOfPutDownAll = for {
-      r <- rs
-      a <- 1 to towerRows
+  val listOfPutDownAll = for (
+      r <- rs;
+      a <- 1 to towerRows;
       b <- 1 to towerCols
-      } yield {
+  ) yield {
         (s"$r",
         Operation(s"$r"+s"putDownCube$a$b", List(), SPAttributes("ability" -> AbilityStructure(s"$r"+".placeBlock.run", Some(s"$r"+".placeBlock.pos",a*10+b))))
         )
@@ -66,15 +70,20 @@ object operationMaker extends SPService {
   val r5toHome = Operation("R5toHome", List(), SPAttributes("ability" -> AbilityStructure("R5.toHome.run", None)))
 
 // X = 5 flytta in till byggplatsen
-  val r2listOfplaceAtPos = for {
+  val r2listOfplaceAtPos = for
+  (
     x <- 1 to 5
-    } yield {
-      Operation(s"r2PlaceAtPos$x", List(), SPAttributes("ability" -> AbilityStructure("R2.placeAtPos.run", Some("R2.placeAtPos.run", x))))
-    }
-  val r2listpickAtPos = for {
+  )
+  yield {
+    (Operation(s"r2PlaceAtPos$x", List(), SPAttributes("ability" -> AbilityStructure("R2.placeAtPos.run", Some("R2.placeAtPos.run", x)))))
+  }
+
+  val r2listpickAtPos = for
+  {
     x <- 1 to 5
-    } yield {
-      Operation(s"r2PickAtPos$x", List(), SPAttributes("ability" -> AbilityStructure("R2.pickAtPos.run", Some("R2.pickAtPos.run", x))))
+  }
+    yield {
+      (Operation(s"r2PickAtPos$x", List(), SPAttributes("ability" -> AbilityStructure("R2.pickAtPos.run", Some("R2.pickAtPos.run", x)))))
     }
 
   // Operations for flexlink
@@ -92,6 +101,72 @@ object operationMaker extends SPService {
   val h3Down = Operation("h3.down.run", List(), SPAttributes("ability"-> AbilityStructure("h3.down.run", None)))
 
 
+  //Tar in bygg order
+  //Returnerar en lista med placerings operationer
+
+  def getPlaceOperations(ls :List[List[Int]]) = {
+    val returnList: List[Operation] = List()
+    for ( a <-0 to 3) {
+      for (b <- 0 to 3) {
+        if (ls(a)(b) > 0)
+          returnList :: List(r4listOfPutDown(4 * a + b))
+      }
+    }
+    returnList
+  }
+
+  //Tar in bygg order
+  //Returnerar en lista med plocknings operationer
+
+  def getPickOperations(ls :List[List[Int]]) = {
+    val returnList: List[Operation] = List()
+    var i = 0;
+    for(a <- 0 to 3) {
+       for(b <- 0 to 3) {
+          if(ls(a)(b) > 0) {
+            returnList::List(r4listOfPickUp(i))
+            i += 1
+          }
+       }
+    }
+    returnList
+  }
+
+  //Fråga Robotgruppen om start och slut operationerna
+
+  //Retunerar en lista av operationer som innehåller startsekvensen av processen
+
+  def getStartOperations():List[Operation] =  {
+    List(r4toHome,r5toHome,/*Hämta byggpalett*/r2homeTableToHomeBP,r2listOfplaceAtPos(5),
+      h2Up,r2homeBPToHomeTable,/*Hämta från hissen*/r2elevatorStn2ToHomeTable, r4toDodge,h2Down, r2homeTableToHomeBP, r2listOfplaceAtPos(1),
+      h2Up/*r2hämtapalletvidh2*/,r2elevatorStn2ToHomeTable,r2homeTableToHomeBP, h2Down,r2listOfplaceAtPos(2)
+    )
+  }
+
+  //Retunerar en lista av operationer som innehåller slutsekvensen av processen
+
+  def getEndOperations():List[Operation] = {
+    List(r4toDodge,r2homeTableToHomeBP,r2listpickAtPos(1),h3Up,r2homeBPToHomeTable,r2homeTableToElevatorStn3,
+      h3Down,r2listpickAtPos(1),h3Up,r2homeTableToElevatorStn3,h3Down,r2homeTableToHomeBP,h3Up,r2listpickAtPos(2),
+      r2homeTableToElevatorStn3, h3Down
+    )
+  }
+
+  //Skapar en SOP
+
+  def getSOP(ls : List[List[Int]]) = {
+    val sop = SOP();
+    for(ls <- getStartOperations()) {
+      sop.+(SOP(Sequence(ls)))
+    }
+    var tempList = for((pi, pl) <-(getPickOperations(ls) zip getPlaceOperations(ls))) yield sop.+(SOP(Sequence(pi,pl)))
+
+    for(ls <- getEndOperations()) {
+      sop.+(SOP(Sequence(ls)))
+    }
+    sop
+  }
+/*
   val specification = SPAttributes(
       "service" -> SPAttributes(
       "group" -> "hide" // to organize in gui. maybe use "hide" to hide service in gui
@@ -105,19 +180,19 @@ object operationMaker extends SPService {
   def props = ServiceLauncher.props(Props(classOf[operationMaker]))
 
   }
-  
+  */
 
-  class operationMaker extends Actor with ServiceSupport {
-
-    def receive = { /*
+  class operationMaker {
+/*
+    def receive = {
       case r@Request(service, attr, ids, reqID) => {
         val replyTo = sender()
         implicit val rnr = RequestNReply(r, replyTo)
         
 
     val attr = SPAttributes("command"->SPAttributes("commandType"->"execute", "execute"->id,
-      "parameters" -> State(paraMap)))*/
-    val pickOperations = operationMaker.r4listOfPutDown
+      "parameters" -> State(paraMap)))
+    //val pickOperations = operationMaker.r4listOfPutDown
     val placeOperations = operationMaker.r4listOfPutDown
 
     val aSOP = Parallel(Sequence(pickOperations(0), placeOperations(0), pickOperations(1),placeOperations(1)))
@@ -128,8 +203,9 @@ object operationMaker extends SPService {
 
 //  val thaSOP = SOPSpec("thaSOP", List(aSOP), List(op1...), SPAttributes())
        //mottagare ! meddelande
-     }
-
+    // }
+*/
+}
 }
 
 

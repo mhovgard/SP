@@ -40,11 +40,11 @@ class PSLModel extends Actor with ServiceSupport with ModelMaking {
       val core = r.attributes.getAs[ServiceHandlerAttributes]("core").get
 
 
-      val o1 = Operation("h2", List(), SPAttributes("ability"-> AbilityStructure("h2.up.run", Some(-1))))
-      val o2 = Operation("h2",List(), SPAttributes("ability"-> AbilityStructure("h2.down.run", Some(-1))))
-      val o3 = Operation("h3",List(), SPAttributes("ability"-> AbilityStructure("h3.up.run", Some(-1))))
-      val o4 = Operation("h3",List(), SPAttributes("ability"-> AbilityStructure("h3.down.run", Some(-1))))
-      val o5 = Operation("R2.elevatorStn2ToHomeTable.run", List(), SPAttributes("ability"-> AbilityStructure("R2.elevatorStn2ToHomeTable.run", Some(-1))))
+      val o1 = Operation("h2", List(), SPAttributes("ability"-> AbilityStructure("h2.up.run", Some("h2.up.run",-1))))
+      val o2 = Operation("h2",List(), SPAttributes("ability"-> AbilityStructure("h2.down.run", Some("h2.down.run",-1))))
+      val o3 = Operation("h3",List(), SPAttributes("ability"-> AbilityStructure("h3.up.run", Some("h3.up.run",-1))))
+      val o4 = Operation("h3",List(), SPAttributes("ability"-> AbilityStructure("h3.down.run", Some("h3.down.run",-1))))
+      val o5 = Operation("R2.elevatorStn2ToHomeTable.run", List(), SPAttributes("ability"-> AbilityStructure("R2.elevatorStn2ToHomeTable.run", Some("R2.elevatorStn2ToHomeTable.run",-1))))
       val sop = Parallel(Sequence(o1, Sequence(o2, o3), o4))
 
       val sopSpec =  SOPSpec("theSOPSpec", List(sop), SPAttributes())
@@ -52,10 +52,10 @@ class PSLModel extends Actor with ServiceSupport with ModelMaking {
       val longList: List[IDAble] = List(o1, o2, o3, o4, o5, sopSpec)
 
       //test
-      val op1 = Operation("h1.up.run", List(), SPAttributes("ability"-> AbilityStructure("h1.up.run", Some(-1))), ID.makeID("a0f565e2-e44b-4017-a24e-c7d01e970dec").get)
-      val op2 = Operation("h1.down.run", List(), SPAttributes("ability"-> AbilityStructure("h1.down.run", Some(-1))))
-      val op3 = Operation("h4.up.run", List(), SPAttributes("ability"-> AbilityStructure("h4.up.run", Some(-1))))
-      val op4 = Operation("h4.down.run", List(), SPAttributes("ability"-> AbilityStructure("h4.down.run", Some(-1))))
+      val op1 = Operation("h1.up.run", List(), SPAttributes("ability"-> AbilityStructure("h1.up.run", Some("h1.up.run",-1))), ID.makeID("a0f565e2-e44b-4017-a24e-c7d01e970dec").get)
+      val op2 = Operation("h1.down.run", List(), SPAttributes("ability"-> AbilityStructure("h1.down.run", Some("h1.down.run",-1))))
+      val op3 = Operation("h4.up.run", List(), SPAttributes("ability"-> AbilityStructure("h4.up.run", Some("h4.up.run",-1))))
+      val op4 = Operation("h4.down.run", List(), SPAttributes("ability"-> AbilityStructure("h4.down.run", Some("h4.down.run",-1))))
       val aSOP = Parallel(Sequence(op1, Parallel(Sequence(op2, op3), op4)))
 
       val thaSOP = SOPSpec("thaSOP", List(aSOP), SPAttributes())
