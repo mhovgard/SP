@@ -49,7 +49,7 @@
             var mess = {"data": {"getNext": done,"buildOrder": vm.Palett.sendEmpty}};
 
             spServicesService.callService(
-                spServicesService.getService("operatorService"),mess,
+                spServicesService.getService("OperationControl"),mess,
                 function(resp) {
                     if(_.has(resp, "attributes.result")){
                         vm.Palett.pal = resp.attributes.result;
