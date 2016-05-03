@@ -1,7 +1,7 @@
 package sp.runnerService
 
 import akka.actor._
-
+import akka.util.Timeout
 import com.codemettle.reactivemq._
 import com.codemettle.reactivemq.ReActiveMQMessages._
 import com.codemettle.reactivemq.model._
@@ -11,12 +11,17 @@ import scala.concurrent._
 import sp.system.messages._
 import sp.system._
 import sp.domain._
+import sp.domain.logic
 import sp.domain.Logic._
 import sp.extensions._
 import sp.psl._
 import scala.util.Try
 import sp.domain.SOP._
+import scala.concurrent.duration._
+import akka.actor.Actor
+import akka.actor.Props
 
+case class AbilityStructure(name: String, parameter: Option[Int])
 
 object RunnerService extends SPService {
   val specification = SPAttributes(
@@ -32,117 +37,136 @@ object RunnerService extends SPService {
 
   val transformation = List(transformTuple)
   //def props(eventHandler: ActorRef) = Props(classOf[RunnerService], eventHandler)
-  def props(eventHandler: ActorRef, operationController: String) =
-    ServiceLauncher.props(Props(classOf[RunnerService], eventHandler, operationController))
+  def props(eventHandler: ActorRef, serviceHandler: ActorRef, operationController: String) =
+    ServiceLauncher.props(Props(classOf[RunnerService], eventHandler, serviceHandler, operationController))
 }
 
 // Inkluderar eventHandler och namnet på servicen operationController. Skickas med i SP.scala
-class RunnerService(eventHandler: ActorRef, operationController: String) extends Actor with ServiceSupport {
+class RunnerService(eventHandler: ActorRef, serviceHandler: ActorRef, operationController: String) extends Actor with ServiceSupport {
   import context.dispatcher
 
   var parents: Map[SOP, SOP] = Map()
-  var activeSteps: List[SOP] = List()
+  var fakeParents: Map[SOP, SOP] = Map()
+  var activeSteps: List[Hierarchy] = List()
   var parallelRuns: Map[Parallel, List[SOP]] = Map()
   var state: State = State(Map())
   var reply: Option[RequestNReply] = None
+  var readyList: List[ID] = List()
+  var sopen: Option[SOP] = None
+  var operationAbilityMap = Map[ID, AbilityStructure]() // fejk id till abilityStructure
+  var abilityMap = Map[String, Operation]()             // namn till äkta operation
+  implicit var rnr: RequestNReply = null
+  implicit val timeout = Timeout(2 seconds)
+
+
 
 
   def receive = {
-    case r@Request(service, attr, ids, reqID) => {
+    case r @ Request(service, attr, ids, reqID) => {
       val replyTo = sender()
-      implicit val rnr = RequestNReply(r, replyTo)
+      rnr = RequestNReply(r, replyTo)
       reply = Some(rnr)
+
+      // Lyssna på events från alla
+      eventHandler ! SubscribeToSSE(self)
 
       // include this if you want to send progress messages. Send attributes to it during calculations
       val progress = context.actorOf(progressHandler)
 
       val sopID = transform(RunnerService.transformTuple)
 
-
       //lista av tuplar som vi gör om till map
       val idMap: Map[ID, IDAble] = ids.map(item => item.id -> item).toMap
       val sop = Try{idMap(sopID).asInstanceOf[SOPSpec].sop}.map(xs => Parallel(xs:_*))
 
+      val ops = ids.collect{case o:Operation => o}
+      operationAbilityMap = ops.flatMap{ o =>
+        o.attributes.getAs[AbilityStructure]("ability").map(o.id -> _)
+      }.toMap
+
+      val abilities = ops.collect{case o: Operation if o.attributes.getAs[String]("operationType").getOrElse("not") == "ability" => o}
+      println("abilities = " + abilities)
+      abilityMap = abilities.map(o => o.name+".run" -> o).toMap
+
+
+      //println("abilityMap created with" + abilityMap.keySet.head)
+
+      askAService(Request(operationController, SPAttributes("command"->SPAttributes("commandType"->"status"))),serviceHandler)
+
+
       // Makes the parentmap
       sop.foreach(createSOPMap)
+      sopen = sop.toOption
       println("we got a sop: "+sop)
 
-
       // Starts the first op
-      sop.foreach(executeSOP)
+      //      sop.foreach(executeSOP)
       progress ! SPAttributes("activeOps"->activeSteps)
-      startID(ID.newID)
-
     }
+
     // Vi får states från Operation control
     case r @ Response(ids, attr, service, _) if service == operationController => {
-      // Till att börja med är dessa tomma, så vi säger att alla som kör blir färdiga
-
       println(s"we got a state change")
 
+      val newState = attr.getAs[State]("state")
+      newState.foreach{s =>
+        state = State(state.state ++ s.state.filter{case (id, v)=>
+          state.get(id) != newState.get(id)
+        })}
 
-      // Plocka ut alla färdiga steg här
-      // Skicka varje färdigt til stepCompl
-      val copyAS = activeSteps
-      activeSteps = List()
-      val res = copyAS.map(stepCompleted)
-      startID(ID.newID)
+      //lägger till alla ready states i en readyList och tar bort gamla som inte är ready längre
 
-      // Kolla om hela SOPen är färdigt. Inte säker på att detta fungerar
-      if (res.foldLeft(false)(_ || _)){
-        reply.foreach(rnr => rnr.reply ! Response(List(), SPAttributes("status"->"done"), rnr.req.service, rnr.req.reqID))
-        self ! PoisonPill
+      val readyStates = state.state.filter{case (id, value) =>
+        value == SPValue("ready")
       }
+      readyList = readyStates.keys.toList
+      println(s"readyList: $readyList")
+      println(s"state: $state")
 
-      /* val sopMap: Map[SOP, List[SOP]] = Map() //parent -> child
-      //Tanken är man skapar en map där föräldrar pekar på  sina barn (key -> value)
-      //detta kommer sedan användas när man kör en SOP genom att man börjar med en förälder
-      //och kollar vilken typ den har (parallell eller sequence), för att veta hur den ska köra
-      //sina barn. När ett barn har kört klart kommer den då säga till sin förälder att den är klar
-      //och när alla barn till en förälder körts klart går man vidare i kedjan till nästa förälder
-      // TODO: kanske borde använda en treemap? måste nämligen vara noga med att börja med rätt parent
-      def createASopMap(sop: SOP): Map[SOP, List[SOP]] ={
-        val sopSeq = sop.sop
-        val nmbrOfChildren = sopSeq.length-1
-        if (sop.sop.isEmpty) {
-          sopMap
-        }else if (nmbrOfChildren == 0) {
-          sopMap + (sop -> List())
-        } else if (nmbrOfChildren > 0){
-          val sopList = List()
-          for(child <- sopSeq){
-            child -> sopList
-            createASopMap(child)
-          }
-          sopMap + (sop -> sopList)
-        } else {
-          println("something went wrong")
-        }
-        sopMap
-      }
-*/
-
-      def getClassOfSop(sop: SOP): String ={
-        sop match {
-          case s: Parallel => "parallel"
-          //case s: Alternative => "alternative"
-          //case s: Arbitrary => "arbitrary"
-          case s: Sequence => "sequence"
-          //case s: SometimeSequence => "sometimeSequence"
-          //case s: Other => "other"
-          //case s: Hierarchy => "hierarchy"
-          case _ => "noMatch"
+      // if there is nothing started yet
+      if(activeSteps.isEmpty) {
+        sopen.foreach(executeSOP)
+        println("after first new state, started execution")
+      } else {
+        val completedIDs = state.state.filter{case (i,v) => v == SPValue("completed")}.keys.toList
+        println("completed ids = " + completedIDs)
+        // find which "activeSteps" the ids correspond to
+        val activeCompleted = activeSteps.filter(x=>completedIDs.contains(x.operation))
+        println("Från PLC : det som finns i activeSteps" + activeSteps)
+        println("de aktiva som vi lagt till och är klara: " + activeCompleted)
+        println()
+        // execute completed to flop run bit
+        activeCompleted.foreach(x=>startID(x.operation))
+        println("Försöker köra de igen")
+        println()
+        // remove the completed ids
+        activeSteps = activeSteps.filterNot(x=>completedIDs.contains(x.operation))
+        println(s"Från PLC : Activesteps contains: $activeSteps")
+        println("Från PLC : Sätter de som är helt klara genom stepCompleted")
+        val res = activeCompleted.map(stepCompleted)
+        // Kolla om hela SOPen är färdigt. Inte säker på att detta fungerar
+        if (res.foldLeft(false)(_ || _)){
+          println("RunnerService: All done")
+          reply.foreach(rnr => rnr.reply ! Response(List(), SPAttributes("status"->"done", "silent"->true), rnr.req.service, rnr.req.reqID))
+          self ! PoisonPill
         }
       }
-
     }
   }
 
-
   def createSOPMap(x: SOP): Unit = {
-    x.sop.foreach { c =>
-      parents = parents + (c -> x)
-      createSOPMap(c) // terminerar när en SOP inte har några barn
+    println("createSOPMap")
+    x.sop.foreach {
+      case c: Hierarchy =>
+        val abs = operationAbilityMap.get(c.operation).get
+        val a = abilityMap.get(abs.name).get
+        val h = Hierarchy(a.id)
+        println(s"adding in hierarchy : $h to $x")
+        parents = parents + (h -> x)
+        fakeParents = fakeParents + (h -> c)
+      case c => parents = parents + (c -> x)
+        println(s"adding regular : $c to $x")
+        createSOPMap(c) // terminerar när en SOP inte har några barn
     }
   }
 
@@ -152,61 +176,81 @@ class RunnerService(eventHandler: ActorRef, operationController: String) extends
       case x: Parallel => x.sop.foreach(executeSOP)
       case x: Sequence if x.sop.nonEmpty => executeSOP(x.sop.head)
       case x: Hierarchy => {
-        //startID(x.operation)
-        activeSteps = activeSteps :+ x
+        val abs = operationAbilityMap.get(x.operation).get
+        println("abs = " + abs)
+        println("abs name = " + abs.name)
+        println("abilitymap =" + abilityMap)
+        val a = abilityMap.get(abs.name).get
+        println("a = " + a)
+        println("a =" + a)
+        if (checkPreCond(a)) {
+          println("starting operation= " + a.id)
+          startID(a.id)
+          activeSteps = activeSteps :+ Hierarchy(a.id)
+          println(s"Started ${a.id}, activeSteps: $activeSteps")
+        } else {
+          println("precondition failed")
+        }
       }
       case x => println(s"Hmm, vi fick $x i executeSOP")
     }
   }
 
-  import scala.concurrent._
-  import scala.concurrent.duration._
+
+  // kollar om en operations alla preconditions är uppfyllda och kan köras
+  def checkPreCond(x: Operation): Boolean = {
+    val temp = x.conditions.collect{case pc: PropositionCondition => pc}
+    val enabled = temp.foldLeft(true)((a, b) => a && b.eval(state))
+    println(s"checking precondition, conditions = $enabled" )
+
+    println(s"checkPreCond : readylist: $readyList")
+    println(s"CheckPreCond : op: ${x.id}")
+
+    println("We got: " + (readyList.contains(x.id) && enabled))
+    readyList.contains(x.id) && enabled
+  }
+
+
   def startID(id: ID) = {
-    // Skickar ett tomt svar efter 2s.
-
-
-
-    context.system.scheduler.scheduleOnce(2000 milliseconds, self,
-      Response(List(),
-        SPAttributes("state"-> SPAttributes(
-          "a0f565e2-e44b-4017-a24e-c7d01e970dec"->"completed",
-          "b0f565e2-e44b-4017-a24e-c7d01e970dec"->"completed",
-          "c0f565e2-e44b-4017-a24e-c7d01e970dec"->"ready",
-          "d0f565e2-e44b-4017-a24e-c7d01e970dec"->"completed",
-          "e0f565e2-e44b-4017-a24e-c7d01e970dec"->"completed"
-        )),
-        operationController,
-        ID.newID
-      ))
+    println(s"startID : starting id $id")
+    askAService(Request(operationController, SPAttributes("command"->SPAttributes("commandType"->"execute", "execute"->id))),serviceHandler)
   }
 
 
   // Anropas när ett steg blir klart
   def stepCompleted(complSOP: SOP): Boolean = {
-    //println(s"step $complSOP is completed. Parent is ${parents.get(complSOP)}")
+    println(s"step $complSOP is completed. Parent is ${parents.get(complSOP)}")
     parents.get(complSOP) match {
       case Some(p: Parallel) => {
         if (parallelRuns.get(p).isEmpty)
           parallelRuns = parallelRuns + (p->List()) // lägger till nuvarande sop i en lista med p som key
-
         parallelRuns = parallelRuns + (p->(parallelRuns(p) :+ complSOP))
-
         if(p.sop.length > parallelRuns(p).size) {
           false
         }
         else       // om alla i parallellen är klara anropas stepComp igen med p
           stepCompleted(p)
-
         // Om alla är färdiga -> stepCompleted(p)
         // annars vänta
-
       }
       case Some(p: Sequence) => {
         val parentSeq = p.sop                   // ger hela föräldern i en seq
         val nbrOfChildren = parentSeq.length
-        val current = parentSeq.indexOf(complSOP)
+        var current = -10
 
-        if (current >= nbrOfChildren-1) {     // om det är sista steget i sekvensen -> stepCompleted(p)
+        if(complSOP.isInstanceOf[Hierarchy]) {
+          complSOP.asInstanceOf[Hierarchy]
+          val newSOP = fakeParents.get(complSOP).get
+          current = parentSeq.indexOf(newSOP)
+        } else {
+          current = parentSeq.indexOf(complSOP)
+        }
+
+        println(s"current = $current")
+        if ( current == -10) {
+          println("ngt gick väldigt fel.. ")
+          false
+        } else if (current >= nbrOfChildren-1) {     // om det är sista steget i sekvensen -> stepCompleted(p)
           stepCompleted(p)
         }
         else {     // om nuvarande index är mindre än antalet barn tas nuvarande bort ur lista
@@ -218,6 +262,10 @@ class RunnerService(eventHandler: ActorRef, operationController: String) extends
       case None => {
         // nu är vi färdiga
         true
+      }
+      case x@_ => {
+        println(s"stepcompleted: got $x")
+        false
       }
     }
   }

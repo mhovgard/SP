@@ -1,0 +1,5 @@
+http://doc.akka.io/docs/akka/snapshot/general/actor-systems.html#actor-systems
+
+details of supervision. Förälder-barn-skiten kanske?
+http://doc.akka.io/docs/akka/snapshot/general/supervision.html#supervision
+spana in user/: serviceHandler

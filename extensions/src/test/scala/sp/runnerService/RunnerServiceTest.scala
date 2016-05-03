@@ -33,6 +33,7 @@ class RunnerServiceTest(_system: ActorSystem) extends TestKit(_system) with Impl
     TestKit.shutdownActorSystem(system)
   }
 
+
   "The Service Example" must {
     "filter the items" in {
       val o1 = Operation("o1", List(), SPAttributes(), ID.makeID("a0f565e2-e44b-4017-a24e-c7d01e970dec").get)
@@ -44,8 +45,7 @@ class RunnerServiceTest(_system: ActorSystem) extends TestKit(_system) with Impl
 
       val sopSpec =  SOPSpec("theSOPSpec", List(sop), SPAttributes())
 
-      val longList: List[IDAble] = List(o1, o2, o3, o4, o5, sopSpec)
-
+      val longList: List[IDAble] = List(o1, o2, o3, o4, o5, sopSpec
       val r = Request("RunnerService",
         SPAttributes(
           "SOP" -> sopSpec.id
