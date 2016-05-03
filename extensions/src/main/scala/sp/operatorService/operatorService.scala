@@ -65,12 +65,33 @@ object operatorService extends SPService {
   def props = ServiceLauncher.props(Props(classOf[operatorService]))
 
 }
-  class operatorService extends Actor with ServiceSupport {
+  class operatorService extends Actor with ServiceSupport{
 
     def receive = {
-      case r@Request(service, attr, ids, reqID) => {
+
+
+      case r@Request("operatorService", attr, ids, reqID) => {
+        /*if (service == "operatorService") {
+          System.out.println("Hejdå")
+          self ! PoisonPill
+        }*/
         val replyTo = sender()
+        System.out.println("replyTo" + replyTo)
+        //System.out.println("r" + r)
+        //System.out.println("service" + service)
+        //System.out.println("attr" + attr)
+        //System.out.println("ids"+ ids)
+        System.out.println("reqID"+reqID)
+        
+      /*  akka.system.actorSelection("user/" + "TobbeG").resolveOne().onComplete {
+            case Success(actorRef) => // logic with the actorRef
+           case Failure(ex) => Logger.warn("user/" + "somename" + " does not exist")
+            }*/
+        
         implicit val rnr = RequestNReply(r, replyTo)
+        //implicit val aas = askAService(r, "TobbeG")
+        System.out.println("rnr.req.service" + rnr.req.service)
+        System.out.println("rnr.req.reqID" + rnr.req.reqID)
         var getNext: Boolean = transform(operatorService.transformTuple._1)
         var que = List.fill(2)(List.fill(4)("empty"))
         

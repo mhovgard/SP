@@ -13,6 +13,7 @@ import sp.domain._
 import sp.domain.Logic._
 import sp.domain.Operation
 import com.typesafe.config._
+import scala.collection.mutable._
 
 
 object operationMaker {
@@ -26,27 +27,41 @@ object operationMaker {
   val rs = List("R4", "R5")
   val opNamePickedUpCubes = "pickedUpCubes"
 
+  def pack(xs: List[(Any,Any)]): List[List[Any]] = xs match {
+    case Nil      => List(Nil)
+    case x :: Nil => List(x._2 :: Nil)
+    case x :: _   => List(xs.filter(_._1 == xs.head._1).unzip._2) ++ pack(xs.filter(_._1 != xs.head._1))
+  }
 
-  val r4listOfPickUp = for
+
+
+
+  val r4listOfPickUpAll = for
   {
     r <- rs(1);
     x <- r4ReachablePalette;
     a <- 1 to fixturePlaces
   }
     yield {
-      Operation(s"$r"+s"pickCube$x$a",List(), SPAttributes("ability" -> AbilityStructure(s"$r"+".pickBlock.run", Some(s"$r"+".pickBlock.pos",x*10+a))))
+      (x,
+      Operation(s"$r"+s"pickCube$x$a",List(), SPAttributes("ability" -> AbilityStructure(s"$r"+".pickBlock.run", Some(s"$r"+".pickBlock.pos",x*10+a)))))
     }
   
-  val r5listOfPickUp = for
+  val r4listOfPickUp = pack(r4listOfPickUpAll) // List(List(elementen på palett), List(elementen på palett), ...)
+
+
+  val r5listOfPickUpAll = for
   {
     r <- rs(2);
     x <- r5ReachablePalette;
     a <- 1 to fixturePlaces
   }
     yield {
-      Operation(s"$r"+s"pickCube$x$a",List(), SPAttributes("ability" -> AbilityStructure(s"$r"+".pickBlock.run", Some(s"$r"+".pickBlock.pos",x*10+a))))
+      (x
+      Operation(s"$r"+s"pickCube$x$a",List(), SPAttributes("ability" -> AbilityStructure(s"$r"+".pickBlock.run", Some(s"$r"+".pickBlock.pos",x*10+a)))))
     }
-
+  
+  val r5listOfPickUp = pack(r5listOfPickUpAll) // List(List(elementen på palett), List(elementen på palett), ...)
 
 
 
@@ -56,13 +71,13 @@ object operationMaker {
       a <- 1 to towerRows;
       b <- 1 to towerCols
   ) yield {
-        (s"$r",
+        s"$r" -> (a,
         Operation(s"$r"+s"putDownCube$a$b", List(), SPAttributes("ability" -> AbilityStructure(s"$r"+".placeBlock.run", Some(s"$r"+".placeBlock.pos",a*10+b))))
         )
 
   }
-  val r4listOfPutDown = listOfPutDownAll.filter(_._1 == rs(1)).unzip._2
-  val r5listOfPutDown = listOfPutDownAll.filter(_._1 == rs(2)).unzip._2
+  val r4listOfPutDown = pack(listOfPutDownAll.filter(_._1 == rs(1)).unzip._2)
+  val r5listOfPutDown = pack(listOfPutDownAll.filter(_._1 == rs(2)).unzip._2)
 
   val r4toDodge = Operation("R4toDodge", List(), SPAttributes("ability" -> AbilityStructure("R4.toDodge.run", None))) // när man ska lyfta in paletter måste de stå i dodgeläge
   val r5toDodge = Operation("R4toDodge", List(), SPAttributes("ability" -> AbilityStructure("R5.toDodge.run", None)))
@@ -103,23 +118,27 @@ object operationMaker {
 
   //Tar in bygg order
   //Returnerar en lista med placerings operationer
+  // Splittar tornet rakt i mitten där r4 tar klossarna tv och r5 klossarna th
+  // Använder mutable list pga tidskomplexiteten 
 
   def getPlaceOperations(ls :List[List[Int]]) = {
-    val returnList: List[Operation] = List()
-    for ( a <-0 to 3) {
+    val returnList = MutableList[Operation]()
+    for (a <- 0 to 3) {
       for (b <- 0 to 3) {
         if (ls(a)(b) > 0)
-          returnList :: List(r4listOfPutDown(4 * a + b))
+          returnList += (if (b < 2) MutableList[Operation](r4listOfPutDown(a)(b)) else MutableList[Operation](r5listOfPutDown(a)(b)))
       }
     }
-    returnList
+    return returnList.toList
   }
 
-  //Tar in bygg order
-  //Returnerar en lista med plocknings operationer
 
+  //Tar in byggorder
+  //Returnerar en lista med plocknings operationer
+  // Denna är helt jävla fel :o
+  /*
   def getPickOperations(ls :List[List[Int]]) = {
-    val returnList: List[Operation] = List()
+    var returnList: List[Operation] = List()
     var i = 0;
     for(a <- 0 to 3) {
        for(b <- 0 to 3) {
@@ -130,7 +149,10 @@ object operationMaker {
        }
     }
     returnList
-  }
+  }*/
+
+
+//   val r4listOfPutDown = listOfPutDownAll.filter(_._1 == rs(1)).unzip._2
 
   //Fråga Robotgruppen om start och slut operationerna
 
