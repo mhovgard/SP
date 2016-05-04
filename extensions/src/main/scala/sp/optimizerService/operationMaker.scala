@@ -1,25 +1,19 @@
-
 package sp.optimizerService
 
-
-
 import akka.actor._
-import sp.domain.logic.IDAbleLogic
-import scala.concurrent._
-import sp.system.messages._
 import sp.system._
 import sp.domain._
-import sp.domain.Logic._
-
+import sp.domain.logic.{PropositionParser, ActionParser, IDAbleLogic}
+import sp.system.messages._
+import sp.domain.Operation
 
 object operationMaker extends SPService {
   val specification = SPAttributes(
     "service" -> SPAttributes(
-      "group"-> "Operations",
-      "description" -> "Makes operations"
+      "group"->  "Models",
+      "description" -> "Makes model and SOP"
     )
   )
-
   val transformation: List[TransformValue[_]] = List()
   def props = ServiceLauncher.props(Props(classOf[operationMaker]))
 }
@@ -30,8 +24,6 @@ class operationMaker extends Actor with ServiceSupport {
     case r @ Request(service, attr, ids, reqID) => {
       val replyTo = sender()
       implicit val rnr = RequestNReply(r, replyTo)
-
-
 
       //inti
       val init = Thing("init")
@@ -365,15 +357,15 @@ class operationMaker extends Actor with ServiceSupport {
       val OMoveInBuildingPalette2 = Operation("OMoveInBuildingPalette1", List(PropositionCondition(AND(List(NOT(gBuildingPalette2In),gUseTwoPalettes,NOT(gInit))),List(aBuildingPalette2In))),SPAttributes("duration" -> 5))
       val OMoveInBuildPalette = Operation("OMoveInBuildPalette", List(PropositionCondition(AND(List(gInit)),List(aBuildPaletteIn,aInitDone))),SPAttributes("duration" -> 0))
       //Elevator 1 Operations
-      val OMoveUpPalette1WithElevator1 = Operation("OMoveUpPalette1WithElevator1",List(PropositionCondition(AND(List(gBuildingPalette1In)),List(aH1UpWithBuildPalette1True,aBuildingPalette1Out))),SPAttributes("duration" -> 5))
-      val OMoveDownPalette1WithElevator1 = Operation("OMoveDownPalette1WithElevator1",List(PropositionCondition(AND(List(gH1UpWithBuildPalette1,OR(List(gListOfStatusBuildingPalettes(0),gListOfStatusBuildingPalettes(1),gListOfStatusBuildingPalettes(2),gListOfStatusBuildingPalettes(3))))),List(aH1UpWithBuildPalette1False))),SPAttributes("duration" -> 5))
-      val OMoveUpPalette2WithElevator1 = Operation("OMoveUpPalette2WithElevator1",List(PropositionCondition(AND(List(gBuildingPalette2In)),List(aH1UpWithBuildPalette2True,aBuildingPalette2Out))),SPAttributes("duration" -> 5))
-      val OMoveDownPalette2WithElevator1 = Operation("OMoveDownPalette2WithElevator1",List(PropositionCondition(AND(List(gH1UpWithBuildPalette2,OR(List(gListOfStatusBuildingPalettes(4),gListOfStatusBuildingPalettes(5),gListOfStatusBuildingPalettes(6),gListOfStatusBuildingPalettes(7))))),List(aH1UpWithBuildPalette2False))),SPAttributes("duration" -> 5))
+      val OMoveUpPalette1WithElevator1 = Operation("h1.up.run",List(PropositionCondition(AND(List(gBuildingPalette1In)),List(aH1UpWithBuildPalette1True,aBuildingPalette1Out))),SPAttributes("duration" -> 5))
+      val OMoveDownPalette1WithElevator1 = Operation("h1.down.run",List(PropositionCondition(AND(List(gH1UpWithBuildPalette1,OR(List(gListOfStatusBuildingPalettes(0),gListOfStatusBuildingPalettes(1),gListOfStatusBuildingPalettes(2),gListOfStatusBuildingPalettes(3))))),List(aH1UpWithBuildPalette1False))),SPAttributes("duration" -> 5))
+      val OMoveUpPalette2WithElevator1 = Operation("h1.up.run",List(PropositionCondition(AND(List(gBuildingPalette2In)),List(aH1UpWithBuildPalette2True,aBuildingPalette2Out))),SPAttributes("duration" -> 5))
+      val OMoveDownPalette2WithElevator1 = Operation("h1.down.run",List(PropositionCondition(AND(List(gH1UpWithBuildPalette2,OR(List(gListOfStatusBuildingPalettes(4),gListOfStatusBuildingPalettes(5),gListOfStatusBuildingPalettes(6),gListOfStatusBuildingPalettes(7))))),List(aH1UpWithBuildPalette2False))),SPAttributes("duration" -> 5))
       //R4 Dodge operations
-      val OR4ToDodge = Operation("OR4ToDodge",List(PropositionCondition(OR(List(AND(List(OR(List(gH1UpWithBuildPalette1,gH1UpWithBuildPalette2)))),AND(List(gBuildingPaletteComplete)))),List(aR4DodgeTrue))),SPAttributes("duration" -> 3))
+      val OR4ToDodge = Operation("R4toDodge",List(PropositionCondition(OR(List(AND(List(OR(List(gH1UpWithBuildPalette1,gH1UpWithBuildPalette2)))),AND(List(gBuildingPaletteComplete)))),List(aR4DodgeTrue))),SPAttributes("duration" -> 3))
       //val OR4FromDodge = Operation("OR4FromDodge",List(PropositionCondition(OR(List(AND(List()),AND(List()))),List(aR4DodgeFalse,aUnBookR4))))
       //R5 Dodge operations
-      val OR5ToDodge = Operation("OR5ToDodge",List(PropositionCondition(OR(List(AND(List(OR(List(gH1UpWithBuildPalette1,gH1UpWithBuildPalette2)))),AND(List(gBuildingPaletteComplete)))),List(aR5DodgeTrue))),SPAttributes("duration" -> 3))
+      val OR5ToDodge = Operation("R5toDodge",List(PropositionCondition(OR(List(AND(List(OR(List(gH1UpWithBuildPalette1,gH1UpWithBuildPalette2)))),AND(List(gBuildingPaletteComplete)))),List(aR5DodgeTrue))),SPAttributes("duration" -> 3))
       //val OR5FromDodge = Operation("OR5FromDodge",List(PropositionCondition(OR(List(AND(List()),AND(List()))),List(aR5DodgeFalse,aUnBookR2))))
       //R2 Operations
       val OR2Palette1ToR4Space1 = Operation("OR2Palette1ToR4Space1", List(PropositionCondition(AND(List(gR4Dodge,NOT(gListOfStatusBuildingPalettes(0)),NOT(gR2Booked),NOT(gR4Booked),gH1UpWithBuildPalette1)), List(aBookR2,aChangeStatusBuildingPalettesTrue(0)))),SPAttributes("duration" -> 20))
@@ -407,7 +399,7 @@ class operationMaker extends Actor with ServiceSupport {
 
 
       //OPs for picking up cubes by R4 at space 1, row 1
-      val OR4PickUpAt = "OR4PickUpAt"
+      val OR4PickUpAt = "R4pickCube"
       val OListR4PickUpAt11To14 = for {
         e <- 11 to 14 // 0 to 3 in list
       } yield {
@@ -453,7 +445,7 @@ class operationMaker extends Actor with ServiceSupport {
         Operation(s"$OR4PickUpAt$e",List(PropositionCondition(AND(List(gRow3Complete,NOT(gR2Booked),NOT(gR5Booked),NOT(gR4Booked),OR(List(gListOfStatusBuildingPalettes(3),gListOfStatusBuildingPalettes(7))),gListOfCubesToPlaced(e-33),gListOfPickedUpCubes(e-21))), List(aBookR5,aR5HoldingCube,aListOfPickedUpCubesTrue(e-17)))),SPAttributes("duration" -> 4))
       }
       //OPs for picking up cubes by R5 at space 1, row 1
-      val OR5PickUpAt = "OR5PickUpAt"
+      val OR5PickUpAt = "R4pickCube"
       val OListR5PickUpAt31To34 = for {
         e <- 31 to 34 // 16 to 19 in list
       } yield {
@@ -477,7 +469,7 @@ class operationMaker extends Actor with ServiceSupport {
         Operation(s"$OR5PickUpAt$e",List(PropositionCondition(AND(List(gRow3Complete,NOT(gR2Booked),NOT(gR5Booked),NOT(gR4Booked),OR(List(gListOfStatusBuildingPalettes(3),gListOfStatusBuildingPalettes(7))),gListOfCubesToPlaced(e-33),gListOfPickedUpCubes(e-21))), List(aBookR5,aR5HoldingCube,aListOfPickedUpCubesTrue(e-17)))),SPAttributes("duration" -> 6))
       }
       //OPs for placing cubes with R4 11 - 14
-      val OR4PlaceCubeAt = "OR4PlaceCubeAt"
+      val OR4PlaceCubeAt = "R4putDownCube"
       val OListR4PlaceCubeAt11To14 = for {
         e <- 11 to 14// 0 to 3 in list
       } yield {
@@ -502,7 +494,7 @@ class operationMaker extends Actor with ServiceSupport {
       }
 
       //OPs for placing cubes with R5 11 - 14
-      val OR5PlaceCubeAt = "OR5PlaceCubeAt"
+      val OR5PlaceCubeAt = "R5putDownCube"
       val OListR5PlaceCubeAt11To14 = for {
         e <- 11 to 14
       } yield {
@@ -570,8 +562,8 @@ class operationMaker extends Actor with ServiceSupport {
         )),List(aRow3CompleteTrue))),SPAttributes("duration" -> 0))
 
       //Elevator 2 Operations
-      val OMoveUpPalette1WithElevator2 = Operation("OMoveUpPalette1WithElevator1",List(PropositionCondition(AND(List(gBuildPalette1Empty,NOT(gH2OutWithBuildPalette1))),List(aH2OutWithBuildPalette1True))),SPAttributes("duration" -> 5))
-      val OMoveUpPalette2WithElevator2 = Operation("OMoveUpPalette2WithElevator1",List(PropositionCondition(AND(List(gBuildPalette2Empty,NOT(gH2OutWithBuildPalette2))),List(aH2OutWithBuildPalette2True))),SPAttributes("duration" -> 5))
+      val OMoveUpPalette1WithElevator2 = Operation("h2.up.run",List(PropositionCondition(AND(List(gBuildPalette1Empty,NOT(gH2OutWithBuildPalette1))),List(aH2OutWithBuildPalette1True))),SPAttributes("duration" -> 5))
+      val OMoveUpPalette2WithElevator2 = Operation("h2.down.run",List(PropositionCondition(AND(List(gBuildPalette2Empty,NOT(gH2OutWithBuildPalette2))),List(aH2OutWithBuildPalette2True))),SPAttributes("duration" -> 5))
 
       //Remove building palettes ops
       val OR2Palette1RemoveR4Space1 = Operation("OR2Palette1RemoveR4Space1", List(PropositionCondition(AND(List(gR4Dodge,NOT(gR2Booked),gListOfStatusBuildingPalettes(0),gH2OutWithBuildPalette1,NOT(gBuildSpotBooked))), List(aBookR2,aChangeStatusBuildingPalettesFalse(0)))),SPAttributes("duration" -> 20))
@@ -606,7 +598,7 @@ class operationMaker extends Actor with ServiceSupport {
         OMoveOutPalette2WithElevator2,OBuildingPaletteComplete,OR4ToDodge,OR5ToDodge,ORow1Complete,ORow2Complete,ORow3Complete
       )++OListR4PickUpAt11To14++OListR4PickUpAt15To18++OListR4PickUpAt21To24++OListR4PickUpAt25To28++OListR5PickUpAt31To34++OListR5PickUpAt35To38++OListR5PickUpAt41To44++OListR5PickUpAt45To48++OListR4PlaceCubeAt11To14++OListR4PlaceCubeAt21To24++OListR4PlaceCubeAt31To34++OListR4PlaceCubeAt41To44++OListR5PlaceCubeAt11To14++OListR5PlaceCubeAt21To24++OListR5PlaceCubeAt31To34++OListR5PlaceCubeAt41To44++OListR4PickUpAt31To34++OListR4PickUpAt35To38++OListR4PickUpAt41To44++OListR4PickUpAt45To48
 
-
+      //Test optimizer algoritim----------------------------------------------------------------------------------------------------------------------------------------
 
 
       replyTo ! Response(thingList ++ allOPs ++ specialOPs, SPAttributes(), rnr.req.service, rnr.req.reqID)
@@ -615,294 +607,160 @@ class operationMaker extends Actor with ServiceSupport {
   }
 }
 
-// val sopSeq = SOP(Sequence(o11, o12, o13), Sequence(o21, o22, o23), Parallel(o11,o12))
 /*
-val thaSop = SOP(
-  Sequence(
-      OR2PlaceBuildingPalette,OR2Palette1ToR4Space1,OR2Palette2ToR4Space2,
-      OListR4PickUpAt11To14(1),OListR4PlaceCubeAt11To14(1),OListR4PickUpAt11To14(2),OListR4PlaceCubeAt11To14(2),OListR4PickUpAt11To14(3),
-      OListR4PlaceCubeAt11To14(3),OListR4PickUpAt11To14(4),OListR4PlaceCubeAt11To14(4),OListR4PickUpAt15To18(1),OListR4PlaceCubeAt21To24(1),
-      OListR4PickUpAt15To18(2),OListR4PlaceCubeAt21To24(2),OListR4PickUpAt15To18(3),OListR4PlaceCubeAt21To24(3),OListR4PickUpAt15To18(4),
-      OListR4PlaceCubeAt21To24(4),OListR4PickUpAt21To28(1),OListR4PlaceCubeAt31To44(1),OListR4PickUpAt21To28(2),OListR4PlaceCubeAt31To44(2),
-      OListR4PickUpAt21To28(3),OListR4PlaceCubeAt31To44(3),OListR4PickUpAt21To28(4),OListR4PlaceCubeAt31To44(4),OListR4PickUpAt21To28(5),
-      OListR4PlaceCubeAt31To44(5),OListR4PickUpAt21To28(6),OListR4PlaceCubeAt31To44(6),OListR4PickUpAt21To28(7),OListR4PlaceCubeAt31To44(7),
-      OListR4PickUpAt21To28(8),OListR4PlaceCubeAt31To44(8),
-      OR2RemoveBuildingPalette, OR2Palette1RemoveR4Space1, OR2Palette1RemoveR4Space2
+
+object operationMaker extends SPService {
+  val specification = SPAttributes(
+    "service" -> SPAttributes(
+      "group"-> "Operations",
+      "description" -> "Makes operations"
+    )
   )
-//Here is were the next tower would be.
-)
+
+
+
+  val fixturePlaces = 8
+  val towerRows = 4
+  val towerCols = 4
+  val r4ReachablePalette = List(1,2,3,4)
+  val r5ReachablePalette = List(3,4)     // r4 kommer åt alla. r5 kommer åt 3 och 4
+  val rs = List("R4", "R5")
+  val opNamePickedUpCubes = "pickedUpCubes"
+
+  def pack(xs: List[(Any,Any)]): List[List[Any]] = xs match {
+    case Nil      => List(Nil)
+    case x :: Nil => List(x._2 :: Nil)
+    case x :: _   => List(xs.filter(_._1 == xs.head._1).unzip._2) ++ pack(xs.filter(_._1 != xs.head._1))
+  }
+
+
+
+
+  val r4listOfPickUpAll = for
+  {
+    x <- r4ReachablePalette;
+    a <- List.range(1,fixturePlaces) //1 to fixturePlaces
+  }
+    yield {
+      x ->
+        (Operation(s"$rs(0)"+s"pickCube$x$a",List(), SPAttributes("ability" -> AbilityStructure(s"$rs(0)"+".pickBlock.run", Some(s"$rs(0)"+".pickBlock.pos",x*10+a)))))
+    }
+
+  val r4listOfPickUp = pack(r4listOfPickUpAll) // List(List(elementen på palett), List(elementen på palett), ...)
+
+
+  val r5listOfPickUpAll = for
+  {
+    x <- r5ReachablePalette;
+    a <- 1 to fixturePlaces //range kanske inte behövs. Vill inte generera IndexSeq, tyvm.
+  }
+    yield {
+      x ->
+        Operation(s"$rs(1)"+s"pickCube$x$a",List(), SPAttributes("ability" -> AbilityStructure(s"$rs(1)"+".pickBlock.run", Some(s"$rs(1)"+".pickBlock.pos",x*10+a))))
+    }
+
+  val r5listOfPickUp = pack(r5listOfPickUpAll) // List(List(elementen på palett), List(elementen på palett), ...)
+
+
+
+  // Finns inte definierade på detta sätt för R5 än tror jag
+  val listOfPutDownAll = for (
+    r <- rs;
+    a <- 1 to towerRows;
+    b <- 1 to towerCols
+  ) yield {
+    s"$r" -> (a ->
+      Operation(s"$r"+s"putDownCube$a$b", List(), SPAttributes("ability" -> AbilityStructure(s"$r"+".placeBlock.run", Some(s"$r"+".placeBlock.pos",a*10+b)))))
+  }
+  val r4listOfPutDown = pack(listOfPutDownAll.filter(_._1 == rs(0)).unzip._2)
+  val r5listOfPutDown = pack(listOfPutDownAll.filter(_._1 == rs(1)).unzip._2)
+
+  val r4toDodge = Operation("R4toDodge", List(), SPAttributes("ability" -> AbilityStructure("R4.toDodge.run", None))) // när man ska lyfta in paletter måste de stå i dodgeläge
+  val r5toDodge = Operation("R4toDodge", List(), SPAttributes("ability" -> AbilityStructure("R5.toDodge.run", None)))
+  val r4toHome = Operation("R5toHome", List(), SPAttributes("ability" -> AbilityStructure("R4.toHome.run", None)))
+  val r5toHome = Operation("R5toHome", List(), SPAttributes("ability" -> AbilityStructure("R5.toHome.run", None)))
+
+  // X = 5 flytta in till byggplatsen
+  val r2listOfplaceAtPos = for
+  (
+    x <- 1 to 5
+  )
+    yield {
+      (Operation(s"r2PlaceAtPos$x", List(), SPAttributes("ability" -> AbilityStructure("R2.placeAtPos.run", Some("R2.placeAtPos.run", x)))))
+    }
+
+  val r2listpickAtPos = for
+  {
+    x <- 1 to 5
+  }
+    yield {
+      (Operation(s"r2PickAtPos$x", List(), SPAttributes("ability" -> AbilityStructure("R2.pickAtPos.run", Some("R2.pickAtPos.run", x)))))
+    }
+
+  // Operations for flexlink
+  // "R2.placeAtPos.run"
+
+  val r2elevatorStn2ToHomeTable = Operation("r2elevatorStn2ToHomeTable", List(), SPAttributes("ability" -> AbilityStructure("R2.elevatorStn2ToHomeTable.run", None)))
+  val r2homeTableToElevatorStn3 = Operation("r2homeTableToElevatorStn3", List(), SPAttributes("ability" -> AbilityStructure("R2.homeTableToElevatorStn3.run", None)))
+  val r2homeTableToHomeBP = Operation("r2homeTableToHomeBP", List(), SPAttributes("ability" -> AbilityStructure("R2.homeTableToHomeBP.run", None)))
+  val r2homeBPToHomeTable = Operation("r2homeBPToHomeTable", List(), SPAttributes("ability" -> AbilityStructure("R2.homeBPToHomeTable.run", None)))
+
+  //Operation for test
+  val h2Up = Operation("h2.up.run", List(), SPAttributes("ability"-> AbilityStructure("h2.up.run", None)))
+  val h2Down= Operation("h2.down.run", List(), SPAttributes("ability"-> AbilityStructure("h2.down.run", None)))
+  val h3Up = Operation("h3.up.run", List(), SPAttributes("ability"-> AbilityStructure("h3.up.run", None)))
+  val h3Down = Operation("h3.down.run", List(), SPAttributes("ability"-> AbilityStructure("h3.down.run", None)))
+
+
+}
 */
-//(operation = f), indicates finished
 
 
+//object operationMaker {
 
+  // Valuerestrictions for the robots. 
 
 /*
-//Ops for placing cubes with R5
-  val OR5PutCubeAt11 = Operation("OR5PutCubeAt11", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5HoldingCube)), List(aListOfPutDownCubes(1),aR5NotHoldingCube))))
-  val OR5PutCubeAt12 = Operation("OR5PutCubeAt12", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5HoldingCube)), List(aListOfPutDownCubes(2),aR5NotHoldingCube))))
-  val OR5PutCubeAt13 = Operation("OR5PutCubeAt13", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5HoldingCube)), List(aListOfPutDownCubes(3),aR5NotHoldingCube))))
-  val OR5PutCubeAt14 = Operation("OR5PutCubeAt14", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5HoldingCube)), List(aListOfPutDownCubes(4),aR5NotHoldingCube))))
-  val OR5PutCubeAt21 = Operation("OR5PutCubeAt21", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5HoldingCube)), List(aListOfPutDownCubes(5),aR5NotHoldingCube))))
-  val OR5PutCubeAt22 = Operation("OR5PutCubeAt22", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5HoldingCube)), List(aListOfPutDownCubes(6),aR5NotHoldingCube))))
-  val OR5PutCubeAt23 = Operation("OR5PutCubeAt23", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5HoldingCube)), List(aListOfPutDownCubes(7),aR5NotHoldingCube))))
-  val OR5PutCubeAt24 = Operation("OR5PutCubeAt24", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5HoldingCube)), List(aListOfPutDownCubes(8),aR5NotHoldingCube))))
-  val OR5PutCubeAt31 = Operation("OR5PutCubeAt31", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5HoldingCube)), List(aListOfPutDownCubes(9),aR5NotHoldingCube))))
-  val OR5PutCubeAt32 = Operation("OR5PutCubeAt32", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5HoldingCube)), List(aListOfPutDownCubes(10),aR5NotHoldingCube))))
-  val OR5PutCubeAt33 = Operation("OR5PutCubeAt33", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5HoldingCube)), List(aListOfPutDownCubes(11),aR5NotHoldingCube))))
-  val OR5PutCubeAt34 = Operation("OR5PutCubeAt34", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5HoldingCube)), List(aListOfPutDownCubes(12),aR5NotHoldingCube))))
-  val OR5PutCubeAt41 = Operation("OR5PutCubeAt41", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5HoldingCube)), List(aListOfPutDownCubes(13),aR5NotHoldingCube))))
-  val OR5PutCubeAt42 = Operation("OR5PutCubeAt42", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5HoldingCube)), List(aListOfPutDownCubes(14),aR5NotHoldingCube))))
-  val OR5PutCubeAt43 = Operation("OR5PutCubeAt43", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5HoldingCube)), List(aListOfPutDownCubes(15),aR5NotHoldingCube))))
-  val OR5PutCubeAt44 = Operation("OR5PutCubeAt44", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5HoldingCube)), List(aListOfPutDownCubes(16),aR5NotHoldingCube))))
-//Ops for placing cubes with R4
-  val OR4PutCubeAt11 = Operation("OR4PutCubeAt11", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4HoldingCube)), List(aListOfPutDownCubes(1),aR4NotHoldingCube))))
-  val OR4PutCubeAt12 = Operation("OR4PutCubeAt12", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4HoldingCube)), List(aListOfPutDownCubes(2),aR4NotHoldingCube))))
-  val OR4PutCubeAt13 = Operation("OR4PutCubeAt13", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4HoldingCube)), List(aListOfPutDownCubes(3),aR4NotHoldingCube))))
-  val OR4PutCubeAt14 = Operation("OR4PutCubeAt14", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4HoldingCube)), List(aListOfPutDownCubes(4),aR4NotHoldingCube))))
-  val OR4PutCubeAt21 = Operation("OR4PutCubeAt21", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4HoldingCube)), List(aListOfPutDownCubes(5),aR4NotHoldingCube))))
-  val OR4PutCubeAt22 = Operation("OR4PutCubeAt22", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4HoldingCube)), List(aListOfPutDownCubes(6),aR4NotHoldingCube))))
-  val OR4PutCubeAt23 = Operation("OR4PutCubeAt23", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4HoldingCube)), List(aListOfPutDownCubes(7),aR4NotHoldingCube))))
-  val OR4PutCubeAt24 = Operation("OR4PutCubeAt24", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4HoldingCube)), List(aListOfPutDownCubes(8),aR4NotHoldingCube))))
-  val OR4PutCubeAt31 = Operation("OR4PutCubeAt31", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4HoldingCube)), List(aListOfPutDownCubes(9),aR4NotHoldingCube))))
-  val OR4PutCubeAt32 = Operation("OR4PutCubeAt32", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4HoldingCube)), List(aListOfPutDownCubes(10),aR4NotHoldingCube))))
-  val OR4PutCubeAt33 = Operation("OR4PutCubeAt33", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4HoldingCube)), List(aListOfPutDownCubes(11),aR4NotHoldingCube))))
-  val OR4PutCubeAt34 = Operation("OR4PutCubeAt34", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4HoldingCube)), List(aListOfPutDownCubes(12),aR4NotHoldingCube))))
-  val OR4PutCubeAt41 = Operation("OR4PutCubeAt41", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4HoldingCube)), List(aListOfPutDownCubes(13),aR4NotHoldingCube))))
-  val OR4PutCubeAt42 = Operation("OR4PutCubeAt42", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4HoldingCube)), List(aListOfPutDownCubes(14),aR4NotHoldingCube))))
-  val OR4PutCubeAt43 = Operation("OR4PutCubeAt43", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4HoldingCube)), List(aListOfPutDownCubes(15),aR4NotHoldingCube))))
-  val OR4PutCubeAt44 = Operation("OR4PutCubeAt44", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4HoldingCube)), List(aListOfPutDownCubes(16),aR4NotHoldingCube))))
-//OPs for picking up cubes by R5 at spot 1
-  val OR5PickUpAt11 = Operation("OR5PickUpAt11", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5BuildSpace1Booked)), List(aListOfPickedUpCubes(17),aBookR5,aR5HoldingCube))))
-  val OR5PickUpAt12 = Operation("OR5PickUpAt12", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5BuildSpace1Booked)), List(aListOfPickedUpCubes(18),aBookR5,aR5HoldingCube))))
-  val OR5PickUpAt13 = Operation("OR5PickUpAt13", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5BuildSpace1Booked)), List(aListOfPickedUpCubes(19),aBookR5,aR5HoldingCube))))
-  val OR5PickUpAt14 = Operation("OR5PickUpAt14", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5BuildSpace1Booked)), List(aListOfPickedUpCubes(20),aBookR5,aR5HoldingCube))))
-  val OR5PickUpAt15 = Operation("OR5PickUpAt15", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5BuildSpace1Booked)), List(aListOfPickedUpCubes(21),aBookR5,aR5HoldingCube))))
-  val OR5PickUpAt16 = Operation("OR5PickUpAt16", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5BuildSpace1Booked)), List(aListOfPickedUpCubes(22),aBookR5,aR5HoldingCube))))
-  val OR5PickUpAt17 = Operation("OR5PickUpAt17", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5BuildSpace1Booked)), List(aListOfPickedUpCubes(23),aBookR5,aR5HoldingCube))))
-  val OR5PickUpAt18 = Operation("OR5PickUpAt18", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5BuildSpace1Booked)), List(aListOfPickedUpCubes(24),aBookR5,aR5HoldingCube))))
-//OPs for picking up cubes by R5 at spot 2
-  val OR5PickUpAt21 = Operation("OR5PickUpAt21", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5BuildSpace2Booked)), List(aListOfPickedUpCubes(25),aBookR5,aR5HoldingCube))))
-  val OR5PickUpAt22 = Operation("OR5PickUpAt22", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5BuildSpace2Booked)), List(aListOfPickedUpCubes(26),aBookR5,aR5HoldingCube))))
-  val OR5PickUpAt23 = Operation("OR5PickUpAt23", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5BuildSpace2Booked)), List(aListOfPickedUpCubes(27),aBookR5,aR5HoldingCube))))
-  val OR5PickUpAt24 = Operation("OR5PickUpAt24", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5BuildSpace2Booked)), List(aListOfPickedUpCubes(28),aBookR5,aR5HoldingCube))))
-  val OR5PickUpAt25 = Operation("OR5PickUpAt25", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5BuildSpace2Booked)), List(aListOfPickedUpCubes(29),aBookR5,aR5HoldingCube))))
-  val OR5PickUpAt26 = Operation("OR5PickUpAt26", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5BuildSpace2Booked)), List(aListOfPickedUpCubes(30),aBookR5,aR5HoldingCube))))
-  val OR5PickUpAt27 = Operation("OR5PickUpAt27", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5BuildSpace2Booked)), List(aListOfPickedUpCubes(31),aBookR5,aR5HoldingCube))))
-  val OR5PickUpAt28 = Operation("OR5PickUpAt28", List(PropositionCondition(AND(List(NOT(gR5Booked),gR5BuildSpace2Booked)), List(aListOfPickedUpCubes(32),aBookR5,aR5HoldingCube))))
-//OPs for picking up cubes by R4 at spot 1
-  val OR4PickUpAt11 = Operation("OR4PickUpAt11", List(PropositionCondition(parserG.parseStr("").right.get, List(aListOfPickedUpCubes(1),aBookR4,aR4HoldingCube))),SPAttributes("duration" -> 1))
-  val OR4PickUpAt12 = Operation("OR4PickUpAt12", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4BuildSpace1Booked)), List(aListOfPickedUpCubes(2),aBookR4,aR4HoldingCube))))
-  val OR4PickUpAt13 = Operation("OR4PickUpAt13", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4BuildSpace1Booked)), List(aListOfPickedUpCubes(3),aBookR4,aR4HoldingCube))))
-  val OR4PickUpAt14 = Operation("OR4PickUpAt14", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4BuildSpace1Booked)), List(aListOfPickedUpCubes(4),aBookR4,aR4HoldingCube))))
-  val OR4PickUpAt15 = Operation("OR4PickUpAt15", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4BuildSpace1Booked)), List(aListOfPickedUpCubes(5),aBookR4,aR4HoldingCube))))
-  val OR4PickUpAt16 = Operation("OR4PickUpAt16", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4BuildSpace1Booked)), List(aListOfPickedUpCubes(6),aBookR4,aR4HoldingCube))))
-  val OR4PickUpAt17 = Operation("OR4PickUpAt17", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4BuildSpace1Booked)), List(aListOfPickedUpCubes(7),aBookR4,aR4HoldingCube))))
-  val OR4PickUpAt18 = Operation("OR4PickUpAt18", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4BuildSpace1Booked)), List(aListOfPickedUpCubes(8),aBookR4,aR4HoldingCube))))
-//OPs for picking up cubes by R4 at spot 2
-  val OR4PickUpAt21 = Operation("OR4PickUpAt21", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4BuildSpace2Booked)), List(aListOfPickedUpCubes(9),aBookR4,aR4HoldingCube))))
-  val OR4PickUpAt22 = Operation("OR4PickUpAt22", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4BuildSpace2Booked)), List(aListOfPickedUpCubes(10),aBookR4,aR4HoldingCube))))
-  val OR4PickUpAt23 = Operation("OR4PickUpAt23", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4BuildSpace2Booked)), List(aListOfPickedUpCubes(11),aBookR4,aR4HoldingCube))))
-  val OR4PickUpAt24 = Operation("OR4PickUpAt24", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4BuildSpace2Booked)), List(aListOfPickedUpCubes(12),aBookR4,aR4HoldingCube))))
-  val OR4PickUpAt25 = Operation("OR4PickUpAt25", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4BuildSpace2Booked)), List(aListOfPickedUpCubes(13),aBookR4,aR4HoldingCube))))
-  val OR4PickUpAt26 = Operation("OR4PickUpAt26", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4BuildSpace2Booked)), List(aListOfPickedUpCubes(14),aBookR4,aR4HoldingCube))))
-  val OR4PickUpAt27 = Operation("OR4PickUpAt27", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4BuildSpace2Booked)), List(aListOfPickedUpCubes(15),aBookR4,aR4HoldingCube))))
-  val OR4PickUpAt28 = Operation("OR4PickUpAt28", List(PropositionCondition(AND(List(NOT(gR4Booked),gR4BuildSpace2Booked)), List(aListOfPickedUpCubes(16),aBookR4,aR4HoldingCube))))
-*/
-////Actions for moving bulding pallets
-//  val aR2PalettToR5Pos1 = parserA.parseStr("R2PalettToR5Pos1 = true").right.get
-//  val aR2PalettToR5Pos2 = parserA.parseStr("R2PalettToR5Pos2 = true").right.get
-//  val aR2PalettToR4Pos1 = parserA.parseStr("R2PalettToR4Pos1 = true").right.get
-//  val aR2PalettToR4Pos2 = parserA.parseStr("R2PalettToR4Pos2 = true").right.get
-//  val aR2PalettRemoveR5Pos1 = parserA.parseStr("R2PalettRemoveR5Pos1 = true").right.get
-//  val aR2PalettRemoveR5Pos2 = parserA.parseStr("R2PalettRemoveR5Pos2 = true").right.get
-//  val aR2PalettRemoveR4Pos1 = parserA.parseStr("R2PalettRemoveR4Pos1 = true").right.get
-//  val aR2PalettRemoveR4Pos2 = parserA.parseStr("R2PalettRemoveR4Pos2 = true").right.get
-//  val aR2PlaceBuildingPalett = parserA.parseStr("R2PlaceBuildingPalett = true").right.get
-//  val aR2RemoveBuildingPalett = parserA.parseStr("R2RemoveBuildingPalett = true").right.get
-////Actions for picking up cubes for R4 and pallet 1
-//  val aR4PickUpAt11 = parserA.parseStr("R4PickUpAt11 = true").right.get
-//  val aR4PickUpAt12 = parserA.parseStr("R4PickUpAt12 = true").right.get
-//  val aR4PickUpAt13 = parserA.parseStr("R4PickUpAt13 = true").right.get
-//  val aR4PickUpAt14 = parserA.parseStr("R4PickUpAt14 = true").right.get
-//  val aR4PickUpAt15 = parserA.parseStr("R4PickUpAt15 = true").right.get
-//  val aR4PickUpAt16 = parserA.parseStr("R4PickUpAt16 = true").right.get
-//  val aR4PickUpAt17 = parserA.parseStr("R4PickUpAt17 = true").right.get
-//  val aR4PickUpAt18 = parserA.parseStr("R4PickUpAt18 = true").right.get
-//  //Actions for picking up cubes for R4 and pallet 2
-//  val aR4PickUpAt21 = parserA.parseStr("R4PickUpAt21 = true").right.get
-//  val aR4PickUpAt22 = parserA.parseStr("R4PickUpAt22 = true").right.get
-//  val aR4PickUpAt23 = parserA.parseStr("R4PickUpAt23 = true").right.get
-//  val aR4PickUpAt24 = parserA.parseStr("R4PickUpAt24 = true").right.get
-//  val aR4PickUpAt25 = parserA.parseStr("R4PickUpAt25 = true").right.get
-//  val aR4PickUpAt26 = parserA.parseStr("R4PickUpAt26 = true").right.get
-//  val aR4PickUpAt27 = parserA.parseStr("R4PickUpAt27 = true").right.get
-//  val aR4PickUpAt28 = parserA.parseStr("R4PickUpAt28 = true").right.get
-//  //Actions for picking up cubes for R5 and pallet 1
-//  val aR5PickUpAt11 = parserA.parseStr("R5PickUpAt11 = true").right.get
-//  val aR5PickUpAt12 = parserA.parseStr("R5PickUpAt12 = true").right.get
-//  val aR5PickUpAt13 = parserA.parseStr("R5PickUpAt13 = true").right.get
-//  val aR5PickUpAt14 = parserA.parseStr("R5PickUpAt14 = true").right.get
-//  val aR5PickUpAt15 = parserA.parseStr("R5PickUpAt15 = true").right.get
-//  val aR5PickUpAt16 = parserA.parseStr("R5PickUpAt16 = true").right.get
-//  val aR5PickUpAt17 = parserA.parseStr("R5PickUpAt17 = true").right.get
-//  val aR5PickUpAt18 = parserA.parseStr("R5PickUpAt18 = true").right.get
-//  //Actions for picking up cubes for R5 and pallet 2
-//  val aR5PickUpAt21 = parserA.parseStr("R5PickUpAt21 = true").right.get
-//  val aR5PickUpAt22 = parserA.parseStr("R5PickUpAt22 = true").right.get
-//  val aR5PickUpAt23 = parserA.parseStr("R5PickUpAt23 = true").right.get
-//  val aR5PickUpAt24 = parserA.parseStr("R5PickUpAt24 = true").right.get
-//  val aR5PickUpAt25 = parserA.parseStr("R5PickUpAt25 = true").right.get
-//  val aR5PickUpAt26 = parserA.parseStr("R5PickUpAt26 = true").right.get
-//  val aR5PickUpAt27 = parserA.parseStr("R5PickUpAt27 = true").right.get
-//  val aR5PickUpAt28 = parserA.parseStr("R5PickUpAt28 = true").right.get
-//  //Discrabes Actions were R4 can put cubes
-//  val aR4PutCubeAt11 = parserA.parseStr("R4PutCubeAt11 = true").right.get
-//  val aR4PutCubeAt12 = parserA.parseStr("R4PutCubeAt12 = true").right.get
-//  val aR4PutCubeAt13 = parserA.parseStr("R4PutCubeAt13 = true").right.get
-//  val aR4PutCubeAt14 = parserA.parseStr("R4PutCubeAt14 = true").right.get
-//  val aR4PutCubeAt21 = parserA.parseStr("R4PutCubeAt21 = true").right.get
-//  val aR4PutCubeAt22 = parserA.parseStr("R4PutCubeAt22 = true").right.get
-//  val aR4PutCubeAt23 = parserA.parseStr("R4PutCubeAt23 = true").right.get
-//  val aR4PutCubeAt24 = parserA.parseStr("R4PutCubeAt24 = true").right.get
-//  val aR4PutCubeAt31 = parserA.parseStr("R4PutCubeAt31 = true").right.get
-//  val aR4PutCubeAt32 = parserA.parseStr("R4PutCubeAt32 = true").right.get
-//  val aR4PutCubeAt33 = parserA.parseStr("R4PutCubeAt33 = true").right.get
-//  val aR4PutCubeAt34 = parserA.parseStr("R4PutCubeAt34 = true").right.get
-//  val aR4PutCubeAt41 = parserA.parseStr("R4PutCubeAt41 = true").right.get
-//  val aR4PutCubeAt42 = parserA.parseStr("R4PutCubeAt42 = true").right.get
-//  val aR4PutCubeAt43 = parserA.parseStr("R4PutCubeAt43 = true").right.get
-//  val aR4PutCubeAt44 = parserA.parseStr("R4PutCubeAt44 = true").right.get
-//  //Discrabes Actions were R5 can put cubes
-//  val aR5PutCubeAt11 = parserA.parseStr("R5PutCubeAt11 = true").right.get
-//  val aR5PutCubeAt12 = parserA.parseStr("R5PutCubeAt12 = true").right.get
-//  val aR5PutCubeAt13 = parserA.parseStr("R5PutCubeAt13 = true").right.get
-//  val aR5PutCubeAt14 = parserA.parseStr("R5PutCubeAt14 = true").right.get
-//  val aR5PutCubeAt21 = parserA.parseStr("R5PutCubeAt21 = true").right.get
-//  val aR5PutCubeAt22 = parserA.parseStr("R5PutCubeAt22 = true").right.get
-//  val aR5PutCubeAt23 = parserA.parseStr("R5PutCubeAt23 = true").right.get
-//  val aR5PutCubeAt24 = parserA.parseStr("R5PutCubeAt24 = true").right.get
-//  val aR5PutCubeAt31 = parserA.parseStr("R5PutCubeAt31 = true").right.get
-//  val aR5PutCubeAt32 = parserA.parseStr("R5PutCubeAt32 = true").right.get
-//  val aR5PutCubeAt33 = parserA.parseStr("R5PutCubeAt33 = true").right.get
-//  val aR5PutCubeAt34 = parserA.parseStr("R5PutCubeAt34 = true").right.get
-//  val aR5PutCubeAt41 = parserA.parseStr("R5PutCubeAt41 = true").right.get
-//  val aR5PutCubeAt42 = parserA.parseStr("R5PutCubeAt42 = true").right.get
-//  val aR5PutCubeAt43 = parserA.parseStr("R5PutCubeAt43 = true").right.get
-//  val aR5PutCubeAt44 = parserA.parseStr("R5PutCubeAt44 = true").right.get
+  val specification = SPAttributes(
+      "service" -> SPAttributes(
+      "group" -> "hide" // to organize in gui. maybe use "hide" to hide service in gui
+    ),
+    "buildOrder" -> KeyDefinition("List[List[Int]]", List(), None)
+  )
+  val transformTuple =(
+    TransformValue("buildOrder", _.getAs[List[List[Int]]]("buildOrder"))
+    )
+  val transformation = transformToList(transformTuple.productIterator.toList)
+  def props = ServiceLauncher.props(Props(classOf[operationMaker]))
 
+  }
+  */
 
-//  val R2PalettToR5Pos1 = Thing("R2PalettToR5Pos1")
-//  val R2PalettToR5Pos2 = Thing("R2PalettToR5Pos2")
-//  val R2PalettToR4Pos1 = Thing("R2PalletToR4Pos1")
-//  val R2PalettToR4Pos2 = Thing("R2PalettToR4Pos2")
-//  val R2PalettRemoveR5Pos1 = Thing("R2PalettRemoveR5Pos1")
-//  val R2PalettRemoveR5Pos2 = Thing("R2PalettRemoveR5Pos2")
-//  val R2PalettRemoveR4Pos1 = Thing("R2PalettRemoveR4Pos1")
-//  val R2PalettRemoveR4Pos2 = Thing("R2PalettRemoveR4Pos2")
-//  val R2PlaceBuildingPalett = Thing("R2PlaceBuildingPalett")
-//  val R2RemoveBuildingPalett = Thing("R2RemoveBuildingPalett")
-
-//discribes at which pallet (first diget) and position (seconde diget) R4 picks up
-//  val R4PickUpAt: List[Thing] = R4PickUpAt + rR2 = Thing("R4PickUpAt + rR2")
-//  val R4PickUpAt11 = Thing("R4PickUpAt11")
-//  val R4PickUpAt12 = Thing("R4PickUpAt12")
-//  val R4PickUpAt13 = Thing("R4PickUpAt13")
-//  val R4PickUpAt14 = Thing("R4PickUpAt14")
-//  val R4PickUpAt15 = Thing("R4PickUpAt15")
-//  val R4PickUpAt16 = Thing("R4PickUpAt16")
-//  val R4PickUpAt17 = Thing("R4PickUpAt17")
-//  val R4PickUpAt18 = Thing("R4PickUpAt18")
-//  //discribes at which pallet (first diget) and position (seconde diget) R4 picks up
-//  val R4PickUpAt21 = Thing("R4PickUpAt21")
-//  val R4PickUpAt22 = Thing("R4PickUpAt22")
-//  val R4PickUpAt23 = Thing("R4PickUpAt23")
-//  val R4PickUpAt24 = Thing("R4PickUpAt24")
-//  val R4PickUpAt25 = Thing("R4PickUpAt25")
-//  val R4PickUpAt26 = Thing("R4PickUpAt26")
-//  val R4PickUpAt27 = Thing("R4PickUpAt27")
-//  val R4PickUpAt28 = Thing("R4PickUpAt28")
-//  //discribes at which pallet (first diget) and position (seconde diget) R5 picks up
-//  val R5PickUpAt11 = Thing("R4PickUpAt11")
-//  val R5PickUpAt12 = Thing("R4PickUpAt12")
-//  val R5PickUpAt13 = Thing("R4PickUpAt13")
-//  val R5PickUpAt14 = Thing("R4PickUpAt14")
-//  val R5PickUpAt15 = Thing("R4PickUpAt15")
-//  val R5PickUpAt16 = Thing("R4PickUpAt16")
-//  val R5PickUpAt17 = Thing("R4PickUpAt17")
-//  val R5PickUpAt18 = Thing("R4PickUpAt18")
-//  //discribes at which pallet (first diget) and position (seconde diget) R5 picks up
-//  val R5PickUpAt21 = Thing("R4PickUpAt21")
-//  val R5PickUpAt22 = Thing("R4PickUpAt22")
-//  val R5PickUpAt23 = Thing("R4PickUpAt23")
-//  val R5PickUpAt24 = Thing("R4PickUpAt24")
-//  val R5PickUpAt25 = Thing("R4PickUpAt25")
-//  val R5PickUpAt26 = Thing("R4PickUpAt26")
-//  val R5PickUpAt27 = Thing("R4PickUpAt27")
-//  val R5PickUpAt28 = Thing("R4PickUpAt28")
-//Discrabes things were R4 can put cubes
-//  val R4PutCubeAt11 = Thing("R4PutCubeAt11")
-//  val R4PutCubeAt12 = Thing("R4PutCubeAt12")
-//  val R4PutCubeAt13 = Thing("R4PutCubeAt13")
-//  val R4PutCubeAt14 = Thing("R4PutCubeAt14")
-//  val R4PutCubeAt21 = Thing("R4PutCubeAt21")
-//  val R4PutCubeAt22 = Thing("R4PutCubeAt22")
-//  val R4PutCubeAt23 = Thing("R4PutCubeAt23")
-//  val R4PutCubeAt24 = Thing("R4PutCubeAt24")
-//  val R4PutCubeAt31 = Thing("R4PutCubeAt31")
-//  val R4PutCubeAt32 = Thing("R4PutCubeAt32")
-//  val R4PutCubeAt33 = Thing("R4PutCubeAt33")
-//  val R4PutCubeAt34 = Thing("R4PutCubeAt34")
-//  val R4PutCubeAt41 = Thing("R4PutCubeAt41")
-//  val R4PutCubeAt42 = Thing("R4PutCubeAt42")
-//  val R4PutCubeAt43 = Thing("R4PutCubeAt43")
-//  val R4PutCubeAt44 = Thing("R4PutCubeAt44")
-//  //Discrabes things were R5 can put cubes
-//  val R5PutCubeAt11 = Thing("R5PutCubeAt11")
-//  val R5PutCubeAt12 = Thing("R5PutCubeAt12")
-//  val R5PutCubeAt13 = Thing("R5PutCubeAt13")
-//  val R5PutCubeAt14 = Thing("R5PutCubeAt14")
-//  val R5PutCubeAt21 = Thing("R5PutCubeAt21")
-//  val R5PutCubeAt22 = Thing("R5PutCubeAt22")
-//  val R5PutCubeAt23 = Thing("R5PutCubeAt23")
-//  val R5PutCubeAt24 = Thing("R5PutCubeAt24")
-//  val R5PutCubeAt31 = Thing("R5PutCubeAt31")
-//  val R5PutCubeAt32 = Thing("R5PutCubeAt32")
-//  val R5PutCubeAt33 = Thing("R5PutCubeAt33")
-//  val R5PutCubeAt34 = Thing("R5PutCubeAt34")
-//  val R5PutCubeAt41 = Thing("R5PutCubeAt41")
-//  val R5PutCubeAt42 = Thing("R5PutCubeAt42")
-//  val R5PutCubeAt43 = Thing("R5PutCubeAt43")
-//  val R5PutCubeAt44 = Thing("R5PutCubeAt44")
-
+  /*class operationMaker {
 /*
+    def receive = {
+      case r@Request(service, attr, ids, reqID) => {
+        val replyTo = sender()
+        implicit val rnr = RequestNReply(r, replyTo)
+        
 
-  //Init parsers
-  val parserG = sp.domain.logic.PropositionParser(List(newBuildOrder, systemReady))
-  val parserA = sp.domain.logic.ActionParser(List(generateOperatorInstructions))
+    val attr = SPAttributes("command"->SPAttributes("commandType"->"execute", "execute"->id,
+      "parameters" -> State(paraMap)))
+    //val pickOperations = operationMaker.r4listOfPutDown
+    val placeOperations = operationMaker.r4listOfPutDown
 
-  // Things for Guards
-  val newBuildOrder = Thing("newBuildOrder")
-  val systemReady = Thing("systemReady")
-  val operatorInstructionsGenerated = Thing("operatorInstructionsGenerated")
-  val palettReady = Thing("palettReady")
+    val aSOP = Parallel(Sequence(pickOperations(0), placeOperations(0), pickOperations(1),placeOperations(1)))
 
+//    val thaSOP = SOPSpec("thaSOP", List(aSOP), SPAttributes())
 
-  // Things for Actions
-  val generateOperatorInstructions = Thing("generateOperatorInstructions")
+   // askAService(Request("RunnerService", aSOP, List(pickOperations, placeOperations), ID.makeID))
 
-
-
-  //Create gaurds
-  val gNewBuildOrder = parserG.parseStr("newBuildOrder == true").right.get
-  val gSystemReady = parserG.parseStr("systemReady == true").right.get
-  //Create actions
-  val aGenerateOperatorInstructions = parserA.parseStr("generateOperatorInstructions = True").right.get
-
-  //Operations
-  val init = Operation("Init", List(PropositionCondition(AND(List(gNewBuildOrder,gSystemReady)), List(aGenerateOperatorInstructions))),SPAttributes(), ID.newID)
-  //När det finns instruktioner genererade och palett ej redo, visa instruktioner
-  val materialInput = Operation("materialInput", List(PropositionCondition()))
-  //När en palett är redo, kör band och sätt palett ej redo
-  val flexLinkRun = Operation
+//  val thaSOP = SOPSpec("thaSOP", List(aSOP), List(op1...), SPAttributes())
+       //mottagare ! meddelande
+    // }
 */
+}*/
+//}
+
+
+//       val root = HierarchyRoot("Resources", List(h2._1, h3._1, toOper._1, toRobo._1, R5._1, R4._1, R2._1, h1._1, h4._1, sensorIH2._1, HierarchyNode(sopSpec.id), HierarchyNode(thaSOP.id)))
