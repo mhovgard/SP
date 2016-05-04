@@ -9,6 +9,7 @@ import sp.system._
 import sp.system.messages._
 import sp.domain._
 import sp.domain.Logic._
+import scala.collection.mutable
 import scala.concurrent.Future
 import akka.util._
 import akka.pattern.ask
@@ -16,14 +17,23 @@ import scala.concurrent._
 import scala.concurrent.duration._
 import sp.supremicaStuff.auxiliary.DESModelingSupport
 
+
 /**
   * Created by Kristian Eide on 2016-03-09.
   */
-class optimizerService extends DESModelingSupport {
 
-  //gör en service
+object optimizerService extends SPService {
+  val specification = SPAttributes(
+    "service" -> SPAttributes(
+      "group"-> "Optimizer",
+      "description" -> "Makes SOPs"
+    )
+  )
+  val transformation: List[TransformValue[_]] = List()
+  def props = ServiceLauncher.props(Props(classOf[optimizerService]))
+}
 
- //state finns redan
+class optimizerService extends DESModelingSupport with Actor with ServiceSupport {
 
   case class Transition(gCostIn: Int, headIn: Node, tailIn: Node, OPsIn: List[Operation]) {
     var gCost: Int = gCostIn
@@ -42,57 +52,109 @@ class optimizerService extends DESModelingSupport {
     var fCost: Int = fCostIn
   }
 
-  case class TempOP(gCostIn: Int, OPsIn: List[Operation] ) {
+  case class TempOP(gCostIn: Int, OPsIn: List[Operation]) {
     var gCost: Int = gCostIn
     var OPs: List[Operation] = OPsIn
   }
 
+  def receive = {
+    case r@Request(service, attr, ids, reqID) => {
+      val replyTo = sender()
+      implicit val rnr = RequestNReply(r, replyTo)
 
-
-  def createOpsStateVars(ops: List[Operation]) = {
-    ops.map(o => o.id -> sp.domain.logic.OperationLogic.OperationState.inDomain).toMap
-  }
-/*
-  def createSOP (wallScheme: List[List[Int]] ) {
-
-    val initOPs: Operation = operationMaker.OInitOperation
-
-    val statevars = things.map(sv => sv.id -> sv.inDomain).toMap ++ createOpsStateVars(initOPs)
-
-    implicit val props = EvaluateProp(statevars, Set(), ThreeStateDefinition)
-
-    val initState = idleState match {
-      case State(map) => State(map ++ ops.map(_.id -> OperationState.init).toMap)
+    def createOpsStateVars(ops: List[Operation]) = {
+      ops.map(o => o.id -> sp.domain.logic.OperationLogic.OperationState.inDomain).toMap
     }
+      /*
+        val wallScheme: List[List[Int]] = List(List(1,2,3,0),List(1,2,3,4),List(1,2,3,4),List(1,2,3,0))
 
-    var initNode = Node(0,initState,null,null,0,0,0)
+        val initOPs: Operation = null
 
-    var tempInt: Int = 0
-    var tempGCost: Int = 0
-    var sizeOfWallInt: Int = 0
+        val statevars = things.map(sv => sv.id -> sv.inDomain).toMap ++ createOpsStateVars(initOPs)
 
-    for (a <- 1 to 4) {
-      val currentList: List[Int] = wallScheme[a]
-      for(b <- 1 to 4){
-        if (currentList[b] > 0 ){
-          tempGCost = tempGCost + 9
-          initNode.state = operationMaker.listOfWallSchemeOps(tempInt).next(initNode.state)
-          initNode.gCost = tempGCost
-          sizeOfWallInt = sizeOfWallInt +1
+        implicit val props = EvaluateProp(statevars, Set(), ThreeStateDefinition)
+
+        val initState = idleState match {
+          case State(map) => State(map ++ ops.map(_.id -> OperationState.init).toMap)
         }
-        tempInt = tempInt + 1
-      }
+
+        var initNode = Node(0, initState, null, null, 0, 0, 0)
+
+        var tempInt: Int = 0
+        var tempGCost: Int = 0
+        var sizeOfWallInt: Int = 0
+
+        for (a <- 0 to 3) {
+          val currentList = wallScheme(a)
+          for (b <- 0 to 3) {
+            if (currentList(b) != 0) {
+              tempGCost = tempGCost + 9
+              initNode.state = operationMaker.listOfWallSchemeOps(tempInt).next(initNode.state)
+              initNode.hCost = tempGCost
+              sizeOfWallInt = sizeOfWallInt + 1
+            }
+            tempInt = tempInt + 1
+          }
+        }
+
+        var examinedNode: Node = initNode
+
+        var openNodeList: List [Node] = List(examinedNode)
+        var closedNodeList: List [Node] = List(examinedNode)
+
+        while(true){
+
+          val enabledOps = ops.filter(_.conditions.filter(_.attributes.getAs[String]("kind").getOrElse("") == "precondition").headOption
+          match {
+            case Some(cond) => cond.eval(initState)
+            case None => true
+          })
+
+          var op: Operation = enabledOps
+
+          var transitions: List[Transition] = examinedNode.outTran
+          for (each transitions: currentT){
+            var newNode: node = new Node (
+            val name: Int = openNodeList.getLast().name + 1,
+            state,
+            currentT,
+            null,
+            var gCost: int = currentT.gCost + examinedNode.gCost
+            var hCost: int = examinedNode.hCost - currentT.cost*currentT.ops.size()
+            var fCost: int = examinedNode.gCost + examinedNode.hCost
+            ID)
+            openNodeList.add(newNode)
+            )
+          }
+          for(each openNodeList: currentOpenNode){
+            if(currentNode != null && !openNodeList.contains(currentNode.name)){
+              examinedNode = currentNode
+              break
+            }
+            for(each openNodeList: currentOpenNode){
+              if(currentOpenNode != null && !openNodeList.contains(currentOpenNode.name)){
+                if(currentNode.fCost < examinedNode.fCost
+                  || currentOpenNode.fCost == examinedNode.fCost && currentOpenNode.hCost < examinedNode.hCost){
+                  examinedNode = currentNode
+                }
+              }
+            }
+            if(examinedNode.hCost == 0){
+              break                                           //terminate the while loop
+            }
+          }
+          val pathOfOPs = List(Operation),
+
+
+          }
+      */
+
+      replyTo ! Response(List(), SPAttributes(), rnr.req.service, rnr.req.reqID)
+      self ! PoisonPill
+
     }
-
-    var examinedNode: List[Node]
-    examinedNode.add(initNode)
-    var openNodeList: List(Node) = List(examinedNode)
-
-
-
   }
-*/
-
+}
 
 
 //viktig kod
@@ -207,4 +269,4 @@ val newState = op.next(state)
  */
 
 
-}
+
