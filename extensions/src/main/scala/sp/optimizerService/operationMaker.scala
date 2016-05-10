@@ -11,7 +11,6 @@ import sp.domain.logic.{PropositionParser, ActionParser, IDAbleLogic}
 import sp.runnerService.RunnerService
 import scala.concurrent._
 import sp.system.messages._
-import sp.domain.Operation
 import com.typesafe.config._
 import scala.concurrent.Future
 import akka.util._
@@ -381,29 +380,29 @@ class operationMaker extends Actor with ServiceSupport with DESModelingSupport {
       val OR5ToDodge = Operation("R5toDodge", List(PropositionCondition(OR(List(AND(List(OR(List(gH1UpWithBuildPalette1, gH1UpWithBuildPalette2)))), AND(List(gBuildingPaletteComplete)))), List(aR5DodgeTrue))), SPAttributes("duration" -> 3))
       //val OR5FromDodge = Operation("OR5FromDodge",List(PropositionCondition(OR(List(AND(List()),AND(List()))),List(aR5DodgeFalse,aUnBookR2))))
       //R2 Operations
-      val OR2Palette1ToR4Space1 = Operation("OR2Palette1ToR4Space1", List(PropositionCondition(AND(List(gR4Dodge, NOT(gListOfStatusBuildingPalettes(0)), NOT(gR2Booked), NOT(gR4Booked), gH1UpWithBuildPalette1)), List(aBookR2, aChangeStatusBuildingPalettesTrue(0)))), SPAttributes("duration" -> 20))
+      val OR2Palette1ToR4Space1 = Operation("OR2Palette1ToR4Space1", List(PropositionCondition(AND(List(gR4Dodge, NOT(gListOfStatusBuildingPalettes(0)), NOT(gR2Booked), NOT(gR4Booked), gH1UpWithBuildPalette1)), List(aBookR2, aChangeStatusBuildingPalettesTrue(0))),PropositionCondition(AND(List(gR2Booked)),List(aUnBookR2))), SPAttributes("duration" -> 20))
       // (Pos1 clear) Action R2 Booked = True
-      val OR2Palette1ToR4Space2 = Operation("OR2Palette1ToR4Space2", List(PropositionCondition(AND(List(gR4Dodge, NOT(gListOfStatusBuildingPalettes(1)), gListOfStatusBuildingPalettes(0), NOT(gR2Booked), NOT(gR4Booked), gH1UpWithBuildPalette1)), List(aBookR2, aChangeStatusBuildingPalettesTrue(1)))), SPAttributes("duration" -> 20))
+      val OR2Palette1ToR4Space2 = Operation("OR2Palette1ToR4Space2", List(PropositionCondition(AND(List(gR4Dodge, NOT(gListOfStatusBuildingPalettes(1)), gListOfStatusBuildingPalettes(0), NOT(gR2Booked), NOT(gR4Booked), gH1UpWithBuildPalette1)), List(aBookR2, aChangeStatusBuildingPalettesTrue(1))),PropositionCondition(AND(List(gR2Booked)),List(aUnBookR2))), SPAttributes("duration" -> 20))
       // (Pos2 clear AND POS1 filled)
-      val OR2Palette1ToR5Space1 = Operation("OR2Palette1ToR5Space1", List(PropositionCondition(AND(List(gR4Dodge, gR5Dodge, NOT(gListOfStatusBuildingPalettes(2)), NOT(gR2Booked), NOT(gR4Booked), gH1UpWithBuildPalette1)), List(aBookR2, aChangeStatusBuildingPalettesTrue(2)))), SPAttributes("duration" -> 20))
+      val OR2Palette1ToR5Space1 = Operation("OR2Palette1ToR5Space1", List(PropositionCondition(AND(List(gR4Dodge, gR5Dodge, NOT(gListOfStatusBuildingPalettes(2)), NOT(gR2Booked), NOT(gR4Booked), gH1UpWithBuildPalette1)), List(aBookR2, aChangeStatusBuildingPalettesTrue(2))),PropositionCondition(AND(List(gR2Booked)),List(aUnBookR2))), SPAttributes("duration" -> 20))
       // (Pos1 clear)
-      val OR2Palette1ToR5Space2 = Operation("OR2Palette1ToR5Space2", List(PropositionCondition(AND(List(gR4Dodge, gR5Dodge, NOT(gListOfStatusBuildingPalettes(3)), gListOfStatusBuildingPalettes(2), NOT(gR2Booked), NOT(gR4Booked), gH1UpWithBuildPalette1)), List(aBookR2, aChangeStatusBuildingPalettesTrue(3)))), SPAttributes("duration" -> 20))
+      val OR2Palette1ToR5Space2 = Operation("OR2Palette1ToR5Space2", List(PropositionCondition(AND(List(gR4Dodge, gR5Dodge, NOT(gListOfStatusBuildingPalettes(3)), gListOfStatusBuildingPalettes(2), NOT(gR2Booked), NOT(gR4Booked), gH1UpWithBuildPalette1)), List(aBookR2, aChangeStatusBuildingPalettesTrue(3))),PropositionCondition(AND(List(gR2Booked)),List(aUnBookR2))), SPAttributes("duration" -> 20))
       // (Pos2 clear AND POS1 filled)
-      val OR2Palette2ToR4Space1 = Operation("OR2Palette2ToR4Space1", List(PropositionCondition(AND(List(gR4Dodge, NOT(gListOfStatusBuildingPalettes(4)), NOT(gR2Booked), NOT(gR4Booked), gH1UpWithBuildPalette2)), List(aBookR2, aChangeStatusBuildingPalettesTrue(4)))), SPAttributes("duration" -> 20))
+      val OR2Palette2ToR4Space1 = Operation("OR2Palette2ToR4Space1", List(PropositionCondition(AND(List(gR4Dodge, NOT(gListOfStatusBuildingPalettes(4)), NOT(gR2Booked), NOT(gR4Booked), gH1UpWithBuildPalette2)), List(aBookR2, aChangeStatusBuildingPalettesTrue(4))),PropositionCondition(AND(List(gR2Booked)),List(aUnBookR2))), SPAttributes("duration" -> 20))
       // (Pos1 clear) Action R2 Booked = True
-      val OR2Palette2ToR4Space2 = Operation("OR2Palette2ToR4Space2", List(PropositionCondition(AND(List(gR4Dodge, NOT(gListOfStatusBuildingPalettes(5)), gListOfStatusBuildingPalettes(4), NOT(gR2Booked), NOT(gR4Booked), gH1UpWithBuildPalette2)), List(aBookR2, aChangeStatusBuildingPalettesTrue(5)))), SPAttributes("duration" -> 20))
+      val OR2Palette2ToR4Space2 = Operation("OR2Palette2ToR4Space2", List(PropositionCondition(AND(List(gR4Dodge, NOT(gListOfStatusBuildingPalettes(5)), gListOfStatusBuildingPalettes(4), NOT(gR2Booked), NOT(gR4Booked), gH1UpWithBuildPalette2)), List(aBookR2, aChangeStatusBuildingPalettesTrue(5))),PropositionCondition(AND(List(gR2Booked)),List(aUnBookR2))), SPAttributes("duration" -> 20))
       // (Pos2 clear AND POS1 filled)
-      val OR2Palette2ToR5Space1 = Operation("OR2Palette2ToR5Space1", List(PropositionCondition(AND(List(gR4Dodge, gR5Dodge, NOT(gListOfStatusBuildingPalettes(6)), NOT(gR2Booked), NOT(gR4Booked), gH1UpWithBuildPalette2)), List(aBookR2, aChangeStatusBuildingPalettesTrue(6)))), SPAttributes("duration" -> 20))
+      val OR2Palette2ToR5Space1 = Operation("OR2Palette2ToR5Space1", List(PropositionCondition(AND(List(gR4Dodge, gR5Dodge, NOT(gListOfStatusBuildingPalettes(6)), NOT(gR2Booked), NOT(gR4Booked), gH1UpWithBuildPalette2)), List(aBookR2, aChangeStatusBuildingPalettesTrue(6))),PropositionCondition(AND(List(gR2Booked)),List(aUnBookR2))), SPAttributes("duration" -> 20))
       // (Pos1 clear)
-      val OR2Palette2ToR5Space2 = Operation("OR2Palette2ToR5Space2", List(PropositionCondition(AND(List(gR4Dodge, gR5Dodge, NOT(gListOfStatusBuildingPalettes(7)), gListOfStatusBuildingPalettes(6), NOT(gR2Booked), NOT(gR4Booked), gH1UpWithBuildPalette2)), List(aBookR2, aChangeStatusBuildingPalettesTrue(7)))), SPAttributes("duration" -> 20))
+      val OR2Palette2ToR5Space2 = Operation("OR2Palette2ToR5Space2", List(PropositionCondition(AND(List(gR4Dodge, gR5Dodge, NOT(gListOfStatusBuildingPalettes(7)), gListOfStatusBuildingPalettes(6), NOT(gR2Booked), NOT(gR4Booked), gH1UpWithBuildPalette2)), List(aBookR2, aChangeStatusBuildingPalettesTrue(7))),PropositionCondition(AND(List(gR2Booked)),List(aUnBookR2))), SPAttributes("duration" -> 20))
       // (Pos2 clear AND POS1 filled)
-      val OR2PlaceBuildingPalette = Operation("OR2PlaceBuildingPalette", List(PropositionCondition(AND(List(gR4Dodge, gR5Dodge, gBuildPaletteIn, NOT(gR2Booked), NOT(gR4Booked), NOT(gR5Booked), NOT(gBuildSpotBooked))), List(aBookR2, aBuildSpotBook))), SPAttributes("duration" -> 20))
-      //
-      val OR2RemoveBooking = Operation("OR2RemoveBooking", List(PropositionCondition(AND(List(gR2Booked)), List(aUnBookR2))), SPAttributes("duration" -> 0))
+      val OR2PlaceBuildingPalette = Operation("OR2PlaceBuildingPalette", List(PropositionCondition(AND(List(gR4Dodge, gR5Dodge, gBuildPaletteIn, NOT(gR2Booked), NOT(gR4Booked), NOT(gR5Booked), NOT(gBuildSpotBooked))), List(aBookR2, aBuildSpotBook)),PropositionCondition(AND(List(gR2Booked)),List(aUnBookR2))), SPAttributes("duration" -> 20))
+      //old booking ops
+      //val OR2RemoveBooking = Operation("OR2RemoveBooking", List(PropositionCondition(AND(List(gR2Booked)), List(aUnBookR2))), SPAttributes("duration" -> 0))
       // After operations that books R2
-      val OR4RemoveBooking = Operation("OR2RemoveBooking", List(PropositionCondition(AND(List(gR4Booked)), List(aUnBookR4))), SPAttributes("duration" -> 0))
+      val OR4RemoveBooking = Operation("OR2RemoveBooking", List(PropositionCondition(AND(List(gR4Booked,NOT(gR4HoldingCube))), List(aUnBookR4))), SPAttributes("duration" -> 0))
       // After operations that books R4
-      val OR5RemoveBooking = Operation("OR2RemoveBooking", List(PropositionCondition(AND(List(gR5Booked)), List(aUnBookR5))), SPAttributes("duration" -> 0))
+      val OR5RemoveBooking = Operation("OR2RemoveBooking", List(PropositionCondition(AND(List(gR5Booked,NOT(gR5HoldingCube))), List(aUnBookR5))), SPAttributes("duration" -> 0))
       // After operations that books R5
       //operationerna nedan skall ändras så att de passar bättre och blir sumerade
 
@@ -437,24 +436,24 @@ class operationMaker extends Actor with ServiceSupport with DESModelingSupport {
       val OListR4PickUpAt31To34 = for {
         e <- 31 to 34 // 16 to 19 in list
       } yield {
-        Operation(s"$OR4PickUpAt$e", List(PropositionCondition(AND(List(NOT(gR2Booked), NOT(gR5Booked), NOT(gR4Booked), OR(List(gListOfStatusBuildingPalettes(2), gListOfStatusBuildingPalettes(6))), gListOfCubesToPlaced(e - 31))), List(aBookR5, aR5HoldingCube, aListOfPickedUpCubesTrue(e - 15)))), SPAttributes("duration" -> 4))
+        Operation(s"$OR4PickUpAt$e", List(PropositionCondition(AND(List(NOT(gR2Booked), NOT(gR5Booked), NOT(gR4Booked), OR(List(gListOfStatusBuildingPalettes(2), gListOfStatusBuildingPalettes(6))), gListOfCubesToPlaced(e - 31))), List(aBookR4, aR4HoldingCube, aListOfPickedUpCubesTrue(e - 15)))), SPAttributes("duration" -> 4))
       }
       //OPs for picking up cubes by R5 t space 1, row 2
       val OListR4PickUpAt35To38 = for {
         e <- 35 to 38 // 20 to 23 in list
       } yield {
-        Operation(s"$OR4PickUpAt$e", List(PropositionCondition(AND(List(gRow1Complete, NOT(gR2Booked), NOT(gR5Booked), NOT(gR4Booked), OR(List(gListOfStatusBuildingPalettes(2), gListOfStatusBuildingPalettes(6))), gListOfCubesToPlaced(e - 31), gListOfPickedUpCubes(e - 19))), List(aBookR5, aR5HoldingCube, aListOfPickedUpCubesTrue(e - 15)))), SPAttributes("duration" -> 4))
+        Operation(s"$OR4PickUpAt$e", List(PropositionCondition(AND(List(gRow1Complete, NOT(gR2Booked), NOT(gR5Booked), NOT(gR4Booked), OR(List(gListOfStatusBuildingPalettes(2), gListOfStatusBuildingPalettes(6))), gListOfCubesToPlaced(e - 31), gListOfPickedUpCubes(e - 19))), List(aBookR4, aR4HoldingCube, aListOfPickedUpCubesTrue(e - 15)))), SPAttributes("duration" -> 4))
       }
       //OPs for picking up cubes by R5 t space 2, row 3 and 4
       val OListR4PickUpAt41To44 = for {
         e <- 41 to 44 // 24 to 31 in list
       } yield {
-        Operation(s"$OR4PickUpAt$e", List(PropositionCondition(AND(List(gRow2Complete, NOT(gR2Booked), NOT(gR5Booked), NOT(gR4Booked), OR(List(gListOfStatusBuildingPalettes(3), gListOfStatusBuildingPalettes(7))), gListOfCubesToPlaced(e - 33), gListOfPickedUpCubes(e - 21))), List(aBookR5, aR5HoldingCube, aListOfPickedUpCubesTrue(e - 17)))), SPAttributes("duration" -> 4))
+        Operation(s"$OR4PickUpAt$e", List(PropositionCondition(AND(List(gRow2Complete, NOT(gR2Booked), NOT(gR5Booked), NOT(gR4Booked), OR(List(gListOfStatusBuildingPalettes(3), gListOfStatusBuildingPalettes(7))), gListOfCubesToPlaced(e - 33), gListOfPickedUpCubes(e - 21))), List(aBookR4, aR4HoldingCube, aListOfPickedUpCubesTrue(e - 17)))), SPAttributes("duration" -> 4))
       }
       val OListR4PickUpAt45To48 = for {
         e <- 45 to 48 // 24 to 31 in list
       } yield {
-        Operation(s"$OR4PickUpAt$e", List(PropositionCondition(AND(List(gRow3Complete, NOT(gR2Booked), NOT(gR5Booked), NOT(gR4Booked), OR(List(gListOfStatusBuildingPalettes(3), gListOfStatusBuildingPalettes(7))), gListOfCubesToPlaced(e - 33), gListOfPickedUpCubes(e - 21))), List(aBookR5, aR5HoldingCube, aListOfPickedUpCubesTrue(e - 17)))), SPAttributes("duration" -> 4))
+        Operation(s"$OR4PickUpAt$e", List(PropositionCondition(AND(List(gRow3Complete, NOT(gR2Booked), NOT(gR5Booked), NOT(gR4Booked), OR(List(gListOfStatusBuildingPalettes(3), gListOfStatusBuildingPalettes(7))), gListOfCubesToPlaced(e - 33), gListOfPickedUpCubes(e - 21))), List(aBookR4, aR4HoldingCube, aListOfPickedUpCubesTrue(e - 17)))), SPAttributes("duration" -> 4))
       }
       //OPs for picking up cubes by R5 at space 1, row 1
       val OR5PickUpAt = "R5pickCube"
@@ -485,24 +484,24 @@ class operationMaker extends Actor with ServiceSupport with DESModelingSupport {
       val OListR4PlaceCubeAt11To14 = for {
         e <- 11 to 14 // 0 to 3 in list
       } yield {
-        Operation(s"$OR4PlaceCubeAt$e", List(PropositionCondition(AND(List(NOT(gR4Booked), gR4HoldingCube, NOT(gListOfPutDownCubes(e - 11)), OR(List(gListOfPickedUpCubes(e - 11), gListOfPickedUpCubes(e + 5))))), List(aListOfPutDownCubesTrue(e - 11), aR4NotHoldingCube))), SPAttributes("duration" -> 6))
+        Operation(s"$OR4PlaceCubeAt$e", List(PropositionCondition(AND(List(gR4Booked, gR4HoldingCube, NOT(gListOfPutDownCubes(e - 11)), OR(List(gListOfPickedUpCubes(e - 11), gListOfPickedUpCubes(e + 5))))), List(aListOfPutDownCubesTrue(e - 11), aR4NotHoldingCube)),PropositionCondition(AND(List(gR4Booked)),List(aUnBookR4))), SPAttributes("duration" -> 6))
       }
       //OPs for placing cubes with R4 21 - 24
       val OListR4PlaceCubeAt21To24 = for {
         e <- 21 to 24 // 4 to 7 in list
       } yield {
-        Operation(s"$OR4PlaceCubeAt$e", List(PropositionCondition(AND(List(NOT(gR4Booked), gR4HoldingCube, NOT(gListOfPutDownCubes(e - 17)), OR(List(gListOfPickedUpCubes(e - 17), gListOfPickedUpCubes(e - 1))))), List(aListOfPutDownCubesTrue(e - 17), aR4NotHoldingCube))), SPAttributes("duration" -> 6))
+        Operation(s"$OR4PlaceCubeAt$e", List(PropositionCondition(AND(List(gR4Booked, gR4HoldingCube, NOT(gListOfPutDownCubes(e - 17)), OR(List(gListOfPickedUpCubes(e - 17), gListOfPickedUpCubes(e - 1))))), List(aListOfPutDownCubesTrue(e - 17), aR4NotHoldingCube)),PropositionCondition(AND(List(gR4Booked)),List(aUnBookR4))), SPAttributes("duration" -> 6))
       }
       //OPs for placing cubes with R4 31 - 34
       val OListR4PlaceCubeAt31To34 = for {
         e <- 31 to 34 // 8 to 11 in list
       } yield {
-        Operation(s"$OR4PlaceCubeAt$e", List(PropositionCondition(AND(List(NOT(gR4Booked), gR4HoldingCube, NOT(gListOfPutDownCubes(e - 23)), OR(List(gListOfPickedUpCubes(e - 23), gListOfPickedUpCubes(e - 7))))), List(aListOfPutDownCubesTrue(e - 23), aR4NotHoldingCube))), SPAttributes("duration" -> 6))
+        Operation(s"$OR4PlaceCubeAt$e", List(PropositionCondition(AND(List(gR4Booked, gR4HoldingCube, NOT(gListOfPutDownCubes(e - 23)), OR(List(gListOfPickedUpCubes(e - 23), gListOfPickedUpCubes(e - 7))))), List(aListOfPutDownCubesTrue(e - 23), aR4NotHoldingCube)),PropositionCondition(AND(List(gR4Booked)),List(aUnBookR4))), SPAttributes("duration" -> 6))
       }
       val OListR4PlaceCubeAt41To44 = for {
         e <- 41 to 44 // 12 to 15 in list
       } yield {
-        Operation(s"$OR4PlaceCubeAt$e", List(PropositionCondition(AND(List(NOT(gR4Booked), gR4HoldingCube, NOT(gListOfPutDownCubes(e - 29)), OR(List(gListOfPickedUpCubes(e - 29), gListOfPickedUpCubes(e - 13))))), List(aListOfPutDownCubesTrue(e - 29), aR4NotHoldingCube))), SPAttributes("duration" -> 6))
+        Operation(s"$OR4PlaceCubeAt$e", List(PropositionCondition(AND(List(gR4Booked, gR4HoldingCube, NOT(gListOfPutDownCubes(e - 29)), OR(List(gListOfPickedUpCubes(e - 29), gListOfPickedUpCubes(e - 13))))), List(aListOfPutDownCubesTrue(e - 29), aR4NotHoldingCube)),PropositionCondition(AND(List(gR4Booked)),List(aUnBookR4))), SPAttributes("duration" -> 6))
       }
 
       //OPs for placing cubes with R5 11 - 14
@@ -510,24 +509,24 @@ class operationMaker extends Actor with ServiceSupport with DESModelingSupport {
       val OListR5PlaceCubeAt11To14 = for {
         e <- 11 to 14
       } yield {
-        Operation(s"$OR5PlaceCubeAt$e", List(PropositionCondition(AND(List(NOT(gR5Booked), gR5HoldingCube, NOT(gListOfPutDownCubes(e - 11)), gListOfPickedUpCubes(e + 5))), List(aListOfPutDownCubesTrue(e - 11), aR5NotHoldingCube))), SPAttributes("duration" -> 6))
+        Operation(s"$OR5PlaceCubeAt$e", List(PropositionCondition(AND(List(gR5Booked, gR5HoldingCube, NOT(gListOfPutDownCubes(e - 11)), gListOfPickedUpCubes(e + 5))), List(aListOfPutDownCubesTrue(e - 11), aR5NotHoldingCube)),PropositionCondition(AND(List(gR5Booked)),List(aUnBookR5))), SPAttributes("duration" -> 6))
       }
       //OPs for placing cubes with R5 21 - 24
       val OListR5PlaceCubeAt21To24 = for {
         e <- 21 to 24
       } yield {
-        Operation(s"$OR5PlaceCubeAt$e", List(PropositionCondition(AND(List(NOT(gR5Booked), gR5HoldingCube, NOT(gListOfPutDownCubes(e - 17)), gListOfPickedUpCubes(e - 1))), List(aListOfPutDownCubesTrue(e - 17), aR5NotHoldingCube))), SPAttributes("duration" -> 6))
+        Operation(s"$OR5PlaceCubeAt$e", List(PropositionCondition(AND(List(gR5Booked, gR5HoldingCube, NOT(gListOfPutDownCubes(e - 17)), gListOfPickedUpCubes(e - 1))), List(aListOfPutDownCubesTrue(e - 17), aR5NotHoldingCube)),PropositionCondition(AND(List(gR5Booked)),List(aUnBookR5))), SPAttributes("duration" -> 6))
       }
       //OPs for placing cubes with R5 31 - 44
       val OListR5PlaceCubeAt31To34 = for {
         e <- 31 to 34
       } yield {
-        Operation(s"$OR5PlaceCubeAt$e", List(PropositionCondition(AND(List(NOT(gR5Booked), gR5HoldingCube, NOT(gListOfPutDownCubes(e - 23)), gListOfPickedUpCubes(e - 7))), List(aListOfPutDownCubesTrue(e - 23), aR5NotHoldingCube))), SPAttributes("duration" -> 6))
+        Operation(s"$OR5PlaceCubeAt$e", List(PropositionCondition(AND(List(gR5Booked, gR5HoldingCube, NOT(gListOfPutDownCubes(e - 23)), gListOfPickedUpCubes(e - 7))), List(aListOfPutDownCubesTrue(e - 23), aR5NotHoldingCube)),PropositionCondition(AND(List(gR5Booked)),List(aUnBookR5))), SPAttributes("duration" -> 6))
       }
       val OListR5PlaceCubeAt41To44 = for {
         e <- 41 to 44
       } yield {
-        Operation(s"$OR5PlaceCubeAt$e", List(PropositionCondition(AND(List(NOT(gR5Booked), gR5HoldingCube, NOT(gListOfPutDownCubes(e - 29)), gListOfPickedUpCubes(e - 13))), List(aListOfPutDownCubesTrue(e - 29), aR5NotHoldingCube))), SPAttributes("duration" -> 6))
+        Operation(s"$OR5PlaceCubeAt$e", List(PropositionCondition(AND(List(gR5Booked, gR5HoldingCube, NOT(gListOfPutDownCubes(e - 29)), gListOfPickedUpCubes(e - 13))), List(aListOfPutDownCubesTrue(e - 29), aR5NotHoldingCube)),PropositionCondition(AND(List(gR5Booked)),List(aUnBookR5))), SPAttributes("duration" -> 6))
       }
 
       //Operation which tells when towers is comeplete
@@ -578,23 +577,23 @@ class operationMaker extends Actor with ServiceSupport with DESModelingSupport {
       val OMoveUpPalette2WithElevator2 = Operation("OMoveUpPalette2WithElevator2", List(PropositionCondition(AND(List(gBuildPalette2Empty, NOT(gH2OutWithBuildPalette2))), List(aH2OutWithBuildPalette2True))), SPAttributes("duration" -> 5))
 
       //Remove building palettes ops
-      val OR2Palette1RemoveR4Space1 = Operation("OR2Palette1RemoveR4Space1", List(PropositionCondition(AND(List(gR4Dodge, NOT(gR2Booked), gListOfStatusBuildingPalettes(0), gH2OutWithBuildPalette1, NOT(gBuildSpotBooked))), List(aBookR2, aChangeStatusBuildingPalettesFalse(0)))), SPAttributes("duration" -> 20))
+      val OR2Palette1RemoveR4Space1 = Operation("OR2Palette1RemoveR4Space1", List(PropositionCondition(AND(List(gR4Dodge, NOT(gR2Booked), gListOfStatusBuildingPalettes(0), gH2OutWithBuildPalette1, NOT(gBuildSpotBooked))), List(aBookR2, aChangeStatusBuildingPalettesFalse(0))),PropositionCondition(AND(List(gR2Booked)),List(aUnBookR2))), SPAttributes("duration" -> 20))
       // Operation R4BuildFromPos1 Done
-      val OR2Palette1RemoveR4Space2 = Operation("OR2Palette1RemoveR4Space2", List(PropositionCondition(AND(List(gR4Dodge, NOT(gR2Booked), gListOfStatusBuildingPalettes(1), gH2OutWithBuildPalette1, NOT(gBuildSpotBooked))), List(aBookR2, aChangeStatusBuildingPalettesFalse(1)))), SPAttributes("duration" -> 20))
+      val OR2Palette1RemoveR4Space2 = Operation("OR2Palette1RemoveR4Space2", List(PropositionCondition(AND(List(gR4Dodge, NOT(gR2Booked), gListOfStatusBuildingPalettes(1), gH2OutWithBuildPalette1, NOT(gBuildSpotBooked))), List(aBookR2, aChangeStatusBuildingPalettesFalse(1))),PropositionCondition(AND(List(gR2Booked)),List(aUnBookR2))), SPAttributes("duration" -> 20))
       // Operation R4BuildFromPos2 Done
-      val OR2Palette1RemoveR5Space1 = Operation("OR2Palette1RemoveR5Space1", List(PropositionCondition(AND(List(gR4Dodge, gR5Dodge, NOT(gR2Booked), gListOfStatusBuildingPalettes(2), gH2OutWithBuildPalette1, NOT(gBuildSpotBooked))), List(aBookR2, aChangeStatusBuildingPalettesFalse(2)))), SPAttributes("duration" -> 20))
+      val OR2Palette1RemoveR5Space1 = Operation("OR2Palette1RemoveR5Space1", List(PropositionCondition(AND(List(gR4Dodge, gR5Dodge, NOT(gR2Booked), gListOfStatusBuildingPalettes(2), gH2OutWithBuildPalette1, NOT(gBuildSpotBooked))), List(aBookR2, aChangeStatusBuildingPalettesFalse(2))),PropositionCondition(AND(List(gR2Booked)),List(aUnBookR2))), SPAttributes("duration" -> 20))
       // Operation R5BuildFromPos1 Done
-      val OR2Palette1RemoveR5Space2 = Operation("OR2Palette1RemoveR5Space2", List(PropositionCondition(AND(List(gR4Dodge, gR5Dodge, NOT(gR2Booked), gListOfStatusBuildingPalettes(3), gH2OutWithBuildPalette1, NOT(gBuildSpotBooked))), List(aBookR2, aChangeStatusBuildingPalettesFalse(3)))), SPAttributes("duration" -> 20))
+      val OR2Palette1RemoveR5Space2 = Operation("OR2Palette1RemoveR5Space2", List(PropositionCondition(AND(List(gR4Dodge, gR5Dodge, NOT(gR2Booked), gListOfStatusBuildingPalettes(3), gH2OutWithBuildPalette1, NOT(gBuildSpotBooked))), List(aBookR2, aChangeStatusBuildingPalettesFalse(3))),PropositionCondition(AND(List(gR2Booked)),List(aUnBookR2))), SPAttributes("duration" -> 20))
       // Operation R5BuildFromPos2 Done
-      val OR2Palette2RemoveR4Space1 = Operation("OR2Palette2RemoveR4Space1", List(PropositionCondition(AND(List(gR4Dodge, NOT(gR2Booked), gListOfStatusBuildingPalettes(4), gH2OutWithBuildPalette2, NOT(gBuildSpotBooked))), List(aBookR2, aChangeStatusBuildingPalettesFalse(4)))), SPAttributes("duration" -> 20))
+      val OR2Palette2RemoveR4Space1 = Operation("OR2Palette2RemoveR4Space1", List(PropositionCondition(AND(List(gR4Dodge, NOT(gR2Booked), gListOfStatusBuildingPalettes(4), gH2OutWithBuildPalette2, NOT(gBuildSpotBooked))), List(aBookR2, aChangeStatusBuildingPalettesFalse(4))),PropositionCondition(AND(List(gR2Booked)),List(aUnBookR2))), SPAttributes("duration" -> 20))
       // Operation R4BuildFromPos1 Done
-      val OR2Palette2RemoveR4Space2 = Operation("OR2Palette2RemoveR4Space2", List(PropositionCondition(AND(List(gR4Dodge, NOT(gR2Booked), gListOfStatusBuildingPalettes(5), gH2OutWithBuildPalette2, NOT(gBuildSpotBooked))), List(aBookR2, aChangeStatusBuildingPalettesFalse(5)))), SPAttributes("duration" -> 20))
+      val OR2Palette2RemoveR4Space2 = Operation("OR2Palette2RemoveR4Space2", List(PropositionCondition(AND(List(gR4Dodge, NOT(gR2Booked), gListOfStatusBuildingPalettes(5), gH2OutWithBuildPalette2, NOT(gBuildSpotBooked))), List(aBookR2, aChangeStatusBuildingPalettesFalse(5))),PropositionCondition(AND(List(gR2Booked)),List(aUnBookR2))), SPAttributes("duration" -> 20))
       // Operation R4BuialdFromPos2 Done
-      val OR2Palette2RemoveR5Space1 = Operation("OR2Palette2RemoveR5Space1", List(PropositionCondition(AND(List(gR4Dodge, gR5Dodge, NOT(gR2Booked), gListOfStatusBuildingPalettes(6), gH2OutWithBuildPalette2, NOT(gBuildSpotBooked))), List(aBookR2, aChangeStatusBuildingPalettesFalse(6)))), SPAttributes("duration" -> 20))
+      val OR2Palette2RemoveR5Space1 = Operation("OR2Palette2RemoveR5Space1", List(PropositionCondition(AND(List(gR4Dodge, gR5Dodge, NOT(gR2Booked), gListOfStatusBuildingPalettes(6), gH2OutWithBuildPalette2, NOT(gBuildSpotBooked))), List(aBookR2, aChangeStatusBuildingPalettesFalse(6))),PropositionCondition(AND(List(gR2Booked)),List(aUnBookR2))), SPAttributes("duration" -> 20))
       // Operation R5BuildFromPos1 Done
-      val OR2Palette2RemoveR5Space2 = Operation("OR2Palette2RemoveR5Space2", List(PropositionCondition(AND(List(gR4Dodge, gR5Dodge, NOT(gR2Booked), gListOfStatusBuildingPalettes(7), gH2OutWithBuildPalette2, NOT(gBuildSpotBooked))), List(aBookR2, aChangeStatusBuildingPalettesFalse(7)))), SPAttributes("duration" -> 20))
+      val OR2Palette2RemoveR5Space2 = Operation("OR2Palette2RemoveR5Space2", List(PropositionCondition(AND(List(gR4Dodge, gR5Dodge, NOT(gR2Booked), gListOfStatusBuildingPalettes(7), gH2OutWithBuildPalette2, NOT(gBuildSpotBooked))), List(aBookR2, aChangeStatusBuildingPalettesFalse(7))),PropositionCondition(AND(List(gR2Booked)),List(aUnBookR2))), SPAttributes("duration" -> 20))
       //Op for removing complete tower
-      val OR2RemoveBuildingPalette = Operation("OR2RemoveBuildingPalette", List(PropositionCondition(AND(List(gR4Dodge, gR5Dodge, NOT(gR2Booked), NOT(gR5Booked), NOT(gR4Booked), gBuildSpotBooked, gBuildingPaletteComplete)), List(aBookR2, aBuildSpotUnBook))), SPAttributes("duration" -> 20))
+      val OR2RemoveBuildingPalette = Operation("OR2RemoveBuildingPalette", List(PropositionCondition(AND(List(gR4Dodge, gR5Dodge, NOT(gR2Booked), NOT(gR5Booked), NOT(gR4Booked), gBuildSpotBooked, gBuildingPaletteComplete)), List(aBookR2, aBuildSpotUnBook)),PropositionCondition(AND(List(gR2Booked)),List(aUnBookR2))), SPAttributes("duration" -> 20))
 
       // Ops for moving lowering H2
       val OMoveOutPalette1WithElevator2 = Operation("OMoveUpPalette1WithElevator1", List(PropositionCondition(AND(List(gH2OutWithBuildPalette1, OR(List(gListOfStatusBuildingPalettes(0), gListOfStatusBuildingPalettes(1), gListOfStatusBuildingPalettes(2), gListOfStatusBuildingPalettes(3))))), List(aH2OutWithBuildPalette1False))), SPAttributes("duration" -> 5))
@@ -604,7 +603,7 @@ class operationMaker extends Actor with ServiceSupport with DESModelingSupport {
       val allOPs: List[Operation] = List(OMoveInBuildingPalette1, OMoveInBuildingPalette2, OMoveInBuildPalette, OR2Palette1ToR4Space1,
         OR2Palette1ToR4Space2, OR2Palette1ToR5Space1, OR2Palette1ToR5Space2, OR2Palette2ToR4Space1, OR2Palette2ToR4Space2, OR2Palette2ToR5Space1,
         OR2Palette2ToR5Space2, OMoveUpPalette1WithElevator1, OMoveDownPalette1WithElevator1, OMoveUpPalette2WithElevator1, OMoveDownPalette2WithElevator1,
-        OR2PlaceBuildingPalette, OR2RemoveBooking, OR4RemoveBooking, OR5RemoveBooking, OMoveUpPalette1WithElevator2, OMoveUpPalette2WithElevator2,
+        OR2PlaceBuildingPalette, OR4RemoveBooking, OR5RemoveBooking, OMoveUpPalette1WithElevator2, OMoveUpPalette2WithElevator2,
         OR2Palette1RemoveR4Space1, OR2Palette1RemoveR4Space2, OR2Palette1RemoveR5Space1, OR2Palette1RemoveR5Space2, OR2Palette2RemoveR4Space1,
         OR2Palette2RemoveR4Space2, OR2Palette2RemoveR5Space1, OR2Palette2RemoveR5Space2, OR2RemoveBuildingPalette, OMoveOutPalette1WithElevator2,
         OMoveOutPalette2WithElevator2, OBuildingPaletteComplete, OR4ToDodge, OR5ToDodge, ORow1Complete, ORow2Complete, ORow3Complete
