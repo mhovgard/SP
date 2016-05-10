@@ -225,15 +225,7 @@ object SP extends App {
   )
 
 
-  serviceHandler ! RegisterService(
-    "VariableOperationMapper",
-    system.actorOf(VariableOperationMapper.props, "VariableOperationMapper"),
-    VariableOperationMapper.specification,
-    VariableOperationMapper.transformation
-  )
-
-
-  import sp.TobbeG._
+   import sp.TobbeG._
   serviceHandler ! RegisterService(
     "TobbeG",
     system.actorOf(TobbeG.props, "TobbeG"),
