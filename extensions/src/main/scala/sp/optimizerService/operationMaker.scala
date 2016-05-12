@@ -38,7 +38,8 @@ class operationMaker extends Actor with ServiceSupport with DESModelingSupport {
       implicit val rnr = RequestNReply(r, replyTo)
 
       //inti
-      val init = Thing("init")
+      val init1 = Thing("init1")
+      val init2 = Thing("init2")
       val useTwoPalettes = Thing("useTwoPalettes")
       //For the buildingspace were the tower should be built
       val buildSpotBooked = Thing("buildSpotBooked")
@@ -134,7 +135,7 @@ class operationMaker extends Actor with ServiceSupport with DESModelingSupport {
 
       //Iniate parsers--------------------------------------------------------------------------------------------------------
 
-      val thingList: List[Thing] = List(init, R2Booked, R4Booked, R5Booked, buildSpotBooked, buildPalette1Empty, R5Dodge, R4Dodge,
+      val thingList: List[Thing] = List(init1, init2, R2Booked, R4Booked, R5Booked, buildSpotBooked, buildPalette1Empty, R5Dodge, R4Dodge,
         buildPalette2Empty, buildingPaletteComplete, R2OPComplete, R4OPComplete, R5OPComplete, R4HoldingCube, R5HoldingCube,
         BuildingPalette1In, BuildingPalette2In, H1UpWithBuildPalette1, H1UpWithBuildPalette2, H2UpWithBuildPalette1, H2UpWithBuildPalette2,
         BuildPaletteIn, useTwoPalettes, Row1Complete, Row2Complete, Row3Complete
@@ -150,7 +151,8 @@ class operationMaker extends Actor with ServiceSupport with DESModelingSupport {
       //Create gaurds-------------------------------------------------------------------------------------------------------
 
       //init guard
-      val gInit = parserG.parseStr("init == true").right.get
+      val gInit1 = parserG.parseStr("init1 == true").right.get
+      val gInit2 = parserG.parseStr("init2 == true").right.get
       val gUseTwoPalettes = parserG.parseStr("useTwoPalettes == true").right.get
       //Guards for rows complete
       val gRow1Complete = parserG.parseStr("Row1Complete == true").right.get
@@ -256,10 +258,12 @@ class operationMaker extends Actor with ServiceSupport with DESModelingSupport {
       val aBuildingPalette2Out = parserA.parseStr("BuildingPalette2In = false").right.get
       val aBuildPaletteOut = parserA.parseStr("BuildingPaletteIn = false").right.get
       //init guard
-      val aInit = parserA.parseStr("init = true").right.get
-      val aInitDone = parserA.parseStr("init = false").right.get
-      val aUseTwoPalettesTrue = parserA.parseStr("useTwoPalettes = true").right.get
-      val aUseTwoPalettesFalse = parserA.parseStr("useTwoPalettes = false").right.get
+      val aInit1 = parserA.parseStr("init1 = true").right.get
+      val aInit2 = parserA.parseStr("init2 = true").right.get
+      val aInit1Done = parserA.parseStr("init1 = false").right.get
+      val aInit2Done = parserA.parseStr("init2 = false").right.get
+      //val aUseTwoPalettesTrue = parserA.parseStr("useTwoPalettes = true").right.get
+      //val aUseTwoPalettesFalse = parserA.parseStr("useTwoPalettes = false").right.get
       //Actions for booking robots
       val aBookR2 = parserA.parseStr("R2Booked = true").right.get
       val aBookR4 = parserA.parseStr("R4Booked = true").right.get
@@ -350,24 +354,24 @@ class operationMaker extends Actor with ServiceSupport with DESModelingSupport {
       //Example
       // val init = Operation("Init", List(PropositionCondition(AND(List()), List(aGenerateOperatorInstructions))),SPAttributes(), ID.newID)
       //init OP
-      val OInitOperation = Operation("initOperation", List(PropositionCondition(AND(List(gInit)), List(aInit, aBuildPaletteOut, aBuildingPalette1Out,
+      val OInitOperation = Operation("initOperation", List(PropositionCondition(AND(List(gInit1)), List(aInit1Done, aBuildPaletteOut, aBuildingPalette1Out,
         aUnBookR2, aUnBookR4, aUnBookR5, aBuildPalette1NotEmpty, aBuildPalette2NotEmpty, aH1UpWithBuildPalette1False, aH1UpWithBuildPalette2False,
         aH2OutWithBuildPalette1False, aH2OutWithBuildPalette2False, aBuildSpotUnBook, aNewBuildingPaletteComplete, aR4NotHoldingCube,
-        aR5NotHoldingCube, aUseTwoPalettesFalse, aRow1CompleteFalse, aRow2CompleteFalse, aRow3CompleteFalse
+        aR5NotHoldingCube, aRow1CompleteFalse, aRow2CompleteFalse, aRow3CompleteFalse, aInit2
       ) ++ aListOfPutDownCubesFalse ++ aListOfPickedUpCubesFalse ++ aListOfCubesToPlacedFalse ++ aChangeStatusBuildingPalettesFalse)), SPAttributes("duration" -> 0))
       //use two pallets
-      val OUseTwoPallets = Operation("OUseTwoPallets", List(PropositionCondition(AND(List(AlwaysTrue)), List(aUseTwoPalettesTrue))), SPAttributes("duration" -> 0))
+      //val OUseTwoPallets = Operation("OUseTwoPallets", List(PropositionCondition(AND(List(AlwaysTrue)), List(aUseTwoPalettesTrue))), SPAttributes("duration" -> 0))
       //Wallschem ops
       val OWallSchemeOps = "OWallSchemeOps"
       val listOfWallSchemeOps = for {
         e <- 1 to 16 // 0 to 15 in list
       } yield {
-        Operation(s"$OWallSchemeOps$e", List(PropositionCondition(AND(List(AlwaysTrue)), List(aListOfCubesToPlacedTrue(e - 1)))), SPAttributes("duration" -> 0))
+        Operation(s"$OWallSchemeOps$e", List(PropositionCondition(AND(List(AlwaysFalse)), List(aListOfCubesToPlacedTrue(e - 1)))), SPAttributes("duration" -> 0))
       }
       //Operator Ops
-      val OMoveInBuildingPalette1 = Operation("OMoveInBuildingPalette1", List(PropositionCondition(AND(List(NOT(gBuildingPalette1In), NOT(gInit))), List(aBuildingPalette1In))), SPAttributes("duration" -> 5))
-      val OMoveInBuildingPalette2 = Operation("OMoveInBuildingPalette1", List(PropositionCondition(AND(List(NOT(gBuildingPalette2In), gUseTwoPalettes, NOT(gInit))), List(aBuildingPalette2In))), SPAttributes("duration" -> 5))
-      val OMoveInBuildPalette = Operation("OMoveInBuildPalette", List(PropositionCondition(AND(List(gInit)), List(aBuildPaletteIn, aInitDone))), SPAttributes("duration" -> 0))
+      val OMoveInBuildingPalette1 = Operation("OMoveInBuildingPalette1", List(PropositionCondition(AND(List(NOT(gBuildingPalette1In), NOT(gInit2))), List(aBuildingPalette1In))), SPAttributes("duration" -> 5))
+      val OMoveInBuildingPalette2 = Operation("OMoveInBuildingPalette1", List(PropositionCondition(AND(List(NOT(gBuildingPalette2In), NOT(gInit2))), List(aBuildingPalette2In))), SPAttributes("duration" -> 5))
+      val OMoveInBuildPalette = Operation("OMoveInBuildPalette", List(PropositionCondition(AND(List(gInit2)), List(aBuildPaletteIn, aInit2Done))), SPAttributes("duration" -> 0))
       //Elevator 1 Operations
       val OMoveUpPalette1WithElevator1 = Operation("OMoveUpPalette1WithElevator1", List(PropositionCondition(AND(List(gBuildingPalette1In)), List(aH1UpWithBuildPalette1True, aBuildingPalette1Out))), SPAttributes("duration" -> 5))
       val OMoveDownPalette1WithElevator1 = Operation("OMoveDownPalette1WithElevator1", List(PropositionCondition(AND(List(gH1UpWithBuildPalette1, OR(List(gListOfStatusBuildingPalettes(0), gListOfStatusBuildingPalettes(1), gListOfStatusBuildingPalettes(2), gListOfStatusBuildingPalettes(3))))), List(aH1UpWithBuildPalette1False))), SPAttributes("duration" -> 5))
@@ -599,15 +603,14 @@ class operationMaker extends Actor with ServiceSupport with DESModelingSupport {
       val OMoveOutPalette1WithElevator2 = Operation("OMoveUpPalette1WithElevator1", List(PropositionCondition(AND(List(gH2OutWithBuildPalette1, OR(List(gListOfStatusBuildingPalettes(0), gListOfStatusBuildingPalettes(1), gListOfStatusBuildingPalettes(2), gListOfStatusBuildingPalettes(3))))), List(aH2OutWithBuildPalette1False))), SPAttributes("duration" -> 5))
       val OMoveOutPalette2WithElevator2 = Operation("OMoveUpPalette2WithElevator1", List(PropositionCondition(AND(List(gH2OutWithBuildPalette2, OR(List(gListOfStatusBuildingPalettes(4), gListOfStatusBuildingPalettes(5), gListOfStatusBuildingPalettes(6), gListOfStatusBuildingPalettes(7))))), List(aH2OutWithBuildPalette2False))), SPAttributes("duration" -> 5))
       //LISTs With all OPS
-      val specialOPs: List[Operation] = List(OInitOperation, OUseTwoPallets) ++ listOfWallSchemeOps
-      val allOPs: List[Operation] = List(OMoveInBuildingPalette1, OMoveInBuildingPalette2, OMoveInBuildPalette, OR2Palette1ToR4Space1,
+      val allOPs: List[Operation] = List(OInitOperation, OMoveInBuildingPalette1, OMoveInBuildingPalette2, OMoveInBuildPalette, OR2Palette1ToR4Space1,
         OR2Palette1ToR4Space2, OR2Palette1ToR5Space1, OR2Palette1ToR5Space2, OR2Palette2ToR4Space1, OR2Palette2ToR4Space2, OR2Palette2ToR5Space1,
         OR2Palette2ToR5Space2, OMoveUpPalette1WithElevator1, OMoveDownPalette1WithElevator1, OMoveUpPalette2WithElevator1, OMoveDownPalette2WithElevator1,
         OR2PlaceBuildingPalette, OR4RemoveBooking, OR5RemoveBooking, OMoveUpPalette1WithElevator2, OMoveUpPalette2WithElevator2,
         OR2Palette1RemoveR4Space1, OR2Palette1RemoveR4Space2, OR2Palette1RemoveR5Space1, OR2Palette1RemoveR5Space2, OR2Palette2RemoveR4Space1,
         OR2Palette2RemoveR4Space2, OR2Palette2RemoveR5Space1, OR2Palette2RemoveR5Space2, OR2RemoveBuildingPalette, OMoveOutPalette1WithElevator2,
         OMoveOutPalette2WithElevator2, OBuildingPaletteComplete, OR4ToDodge, OR5ToDodge, ORow1Complete, ORow2Complete, ORow3Complete
-      ) ++ OListR4PickUpAt11To14 ++ OListR4PickUpAt15To18 ++ OListR4PickUpAt21To24 ++ OListR4PickUpAt25To28 ++ OListR5PickUpAt31To34 ++ OListR5PickUpAt35To38 ++ OListR5PickUpAt41To44 ++ OListR5PickUpAt45To48 ++ OListR4PlaceCubeAt11To14 ++ OListR4PlaceCubeAt21To24 ++ OListR4PlaceCubeAt31To34 ++ OListR4PlaceCubeAt41To44 ++ OListR5PlaceCubeAt11To14 ++ OListR5PlaceCubeAt21To24 ++ OListR5PlaceCubeAt31To34 ++ OListR5PlaceCubeAt41To44 ++ OListR4PickUpAt31To34 ++ OListR4PickUpAt35To38 ++ OListR4PickUpAt41To44 ++ OListR4PickUpAt45To48
+      ) ++ OListR4PickUpAt11To14 ++ OListR4PickUpAt15To18 ++ OListR4PickUpAt21To24 ++ OListR4PickUpAt25To28 ++ OListR5PickUpAt31To34 ++ OListR5PickUpAt35To38 ++ OListR5PickUpAt41To44 ++ OListR5PickUpAt45To48 ++ OListR4PlaceCubeAt11To14 ++ OListR4PlaceCubeAt21To24 ++ OListR4PlaceCubeAt31To34 ++ OListR4PlaceCubeAt41To44 ++ OListR5PlaceCubeAt11To14 ++ OListR5PlaceCubeAt21To24 ++ OListR5PlaceCubeAt31To34 ++ OListR5PlaceCubeAt41To44 ++ OListR4PickUpAt31To34 ++ OListR4PickUpAt35To38 ++ OListR4PickUpAt41To44 ++ OListR4PickUpAt45To48 ++ listOfWallSchemeOps
 
       //Test optimizer algoritim----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -618,26 +621,21 @@ class operationMaker extends Actor with ServiceSupport with DESModelingSupport {
         var OPs: List[Operation] = OPsIn
       }
 
-      case class Node(nameIn: Int, stateIn: State, inIn: Transition, outIn: List[Transition], gCostIn: Int, hCostIn: Int, fCostIn: Int) {
+      case class Node(nameIn: Int, stateIn: State, inIn: Transition, outIn: List[Transition], hCostIn: Int, gCostIn: Int, fCostIn: Int) {
         var name: Int = nameIn
         var state: State = stateIn
         var inTran: Transition = inIn
         var outTran: List[Transition] = outIn
-        var gCost: Int = gCostIn
         var hCost: Int = hCostIn
-        var fCost: Int = fCostIn
-      }
-
-      case class TempOP(gCostIn: Int, OPsIn: List[Operation]) {
         var gCost: Int = gCostIn
-        var OPs: List[Operation] = OPsIn
+        var fCost: Int = fCostIn
       }
 
       def createOpsStateVars(ops: List[Operation]) = {
         ops.map(o => o.id -> sp.domain.logic.OperationLogic.OperationState.inDomain).toMap
       }
 
-      val wallScheme: List[List[Int]] = List(List(1, 2, 3, 0), List(1, 2, 3, 4), List(1, 2, 3, 4), List(1, 2, 3, 0))
+      val wallScheme: List[List[Int]] = List(List(1, 1, 1, 0), List(0, 0, 0, 0), List(0, 0, 0, 0), List(0, 0, 0, 0))
 
       val initOPs: List[Operation] = List(OInitOperation)
 
@@ -651,78 +649,98 @@ class operationMaker extends Actor with ServiceSupport with DESModelingSupport {
         case State(map) => State(map ++ allOPs.map(_.id -> OperationState.init).toMap)
       }
 
-      var initNode = Node(0, initState, null, null, 0, 0, 0)
-
-      var tempInt: Int = 0
+      var nameInt: Int = 0
       var tempGCost: Int = 0
       var sizeOfWallInt: Int = 0
+
+      val initNode = Node(nameInt, initState, null, null, 0, 0, 0)
 
       for (a <- 0 to 3) {
         val currentList = wallScheme(a)
         for (b <- 0 to 3) {
           if (currentList(b) != 0) {
             tempGCost = tempGCost + 9
-            initNode.state = listOfWallSchemeOps(tempInt).next(initNode.state)
+            initNode.state = listOfWallSchemeOps(nameInt).next(initNode.state)
             initNode.hCost = tempGCost
             sizeOfWallInt = sizeOfWallInt + 1
           }
-          tempInt = tempInt + 1
+          nameInt = nameInt + 1
         }
       }
 
       var examinedNode: Node = initNode
-
-      var openNodeList: List[Node] = List(examinedNode)
+      var openNodeList: List[Node] = List()
       var closedNodeList: List[Node] = List(examinedNode)
+
 
       var loopVar: Boolean  = true
 
       while (loopVar) {
 
+        closedNodeList = closedNodeList ++ List(examinedNode)
+
         val enabledOps = allOPs.filter(_.conditions.filter(_.attributes.getAs[String]("kind").getOrElse("") == "precondition").headOption
         match {
-          case Some(cond) => cond.eval(initState)
+          case Some(cond) => cond.eval(examinedNode.state)
           case None => true
         })
-        /*
-        var transitions: List[Transition] = examinedNode.outTran
-        for (each transitions: currentT){
-          var newNode: node = new Node (
-          val name: Int = openNodeList.getLast().name + 1,
-          state,
-          currentT,
-          null,
-          var gCost: int = currentT.gCost + examinedNode.gCost
-          var hCost: int = examinedNode.hCost - currentT.cost*currentT.ops.size()
-          var fCost: int = examinedNode.gCost + examinedNode.hCost
-          ID)
-          openNodeList.add(newNode)
-          )
-        }
-        for(each openNodeList: currentOpenNode){
-          if(currentNode != null && !openNodeList.contains(currentNode.name)){
-            examinedNode = currentNode
-            break
+
+
+        //if(enabledOps != null && examinedNode.inTran.OPs != null) {
+          var transitions: List[Transition] = enabledOps.map{o =>
+            Transition(100,null, examinedNode, o :: examinedNode.inTran.OPs)
           }
-          for(each openNodeList: currentOpenNode){
-            if(currentOpenNode != null && !openNodeList.contains(currentOpenNode.name)){
-              if(currentNode.fCost < examinedNode.fCost
-                || currentOpenNode.fCost == examinedNode.fCost && currentOpenNode.hCost < examinedNode.hCost){
-                examinedNode = currentNode
+          import sp.domain.Logic._
+          transitions.map{tempTran =>
+            tempTran.OPs.map{ o =>
+              val tempGCost: Int = o.attributes.getAs[Int]("duration").getOrElse(-1)
+              if (tempGCost < tempTran.gCost) {
+                tempTran.gCost = tempGCost
               }
             }
           }
-          if(examinedNode.hCost == 0){
-            break                                           //terminate the while loop
+        //}
+
+
+          examinedNode.outTran = transitions
+
+        transitions.map{ tempTran =>
+            nameInt = nameInt +1
+            var newNode: Node = new Node(
+              nameInt,
+              examinedNode.state,
+              tempTran,
+              null,
+              examinedNode.hCost - tempTran.gCost*tempTran.OPs.size,        //fixa rätt kostnad
+              tempTran.gCost + examinedNode.gCost,                                //fixa rätt kostnad
+              examinedNode.gCost + examinedNode.hCost                                   //fixa rätt kostnad
+            )
+            if(newNode.hCost < 0){
+              newNode.hCost = 0
+            }
+            tempTran.head = newNode
+            openNodeList = openNodeList ++ List(newNode)
+          }
+          closedNodeList.map{n =>
+            if(!(closedNodeList contains n)){
+              if(n.fCost < examinedNode.fCost){
+                examinedNode = n
+              }
+            }
+          }
+          examinedNode.inTran.OPs.map{ o =>
+            examinedNode.state = o.next(examinedNode.state)
+          }
+          if(examinedNode.outTran == null){
+            loopVar = false                                          //terminate the while loop
           }
         }
-        val pathOfOPs = List(Operation)
-        */
-
-        loopVar = false
-
-      }
-      replyTo ! Response(thingList ++ allOPs ++ specialOPs, SPAttributes(), rnr.req.service, rnr.req.reqID)
+        var pathOfOPs: List[Operation] = List()
+        while (examinedNode.inTran != null){
+          pathOfOPs = pathOfOPs ++ examinedNode.inTran.OPs
+        examinedNode = examinedNode.inTran.tail
+        }
+      replyTo ! Response(pathOfOPs, SPAttributes(), rnr.req.service, rnr.req.reqID)
       self ! PoisonPill
     }
   }
