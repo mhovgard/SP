@@ -621,14 +621,14 @@ class operationMaker extends Actor with ServiceSupport with DESModelingSupport {
         var OPs: List[Operation] = OPsIn
       }
 
-      case class Node(nameIn: Int, stateIn: State, inIn: Transition, outIn: List[Transition], hCostIn: Int, gCostIn: Int, fCostIn: Int) {
+      case class Node(nameIn: Int, stateIn: State, inIn: Transition, outIn: List[Transition], gCostIn: Int) {
         var name: Int = nameIn
         var state: State = stateIn
         var inTran: Transition = inIn
         var outTran: List[Transition] = outIn
-        var hCost: Int = hCostIn
+//        var hCost: Int = hCostIn    //behövs ej för dijksstra
         var gCost: Int = gCostIn
-        var fCost: Int = fCostIn
+//        var fCost: Int = fCostIn    //behövs ej för dijksstra
       }
 
       def createOpsStateVars(ops: List[Operation]) = {
@@ -653,7 +653,7 @@ class operationMaker extends Actor with ServiceSupport with DESModelingSupport {
       var tempGCost: Int = 0
       var sizeOfWallInt: Int = 0
 
-      val initNode = Node(nameInt, initState, null, null, 0, 0, 0)
+      val initNode = Node(nameInt, initState, null, null, 0)
 
       for (a <- 0 to 3) {
         val currentList = wallScheme(a)
@@ -661,7 +661,7 @@ class operationMaker extends Actor with ServiceSupport with DESModelingSupport {
           if (currentList(b) != 0) {
             tempGCost = tempGCost + 9
             initNode.state = listOfWallSchemeOps(nameInt).next(initNode.state)
-            initNode.hCost = tempGCost
+ //           initNode.hCost = tempGCost //behövs ej för dijksstra
             sizeOfWallInt = sizeOfWallInt + 1
           }
           nameInt = nameInt + 1
@@ -711,19 +711,19 @@ class operationMaker extends Actor with ServiceSupport with DESModelingSupport {
               examinedNode.state,
               tempTran,
               null,
-              examinedNode.hCost - tempTran.gCost*tempTran.OPs.size,        //fixa rätt kostnad
-              tempTran.gCost + examinedNode.gCost,                                //fixa rätt kostnad
-              examinedNode.gCost + examinedNode.hCost                                   //fixa rätt kostnad
+//              examinedNode.hCost - tempTran.gCost*tempTran.OPs.size,        //fixa rätt kostnad, behövs ej för dijksstra
+              tempTran.gCost + examinedNode.gCost                                //fixa rätt kostnad
+//              examinedNode.gCost + examinedNode.hCost                                   //fixa rätt kostnad, behövs ej för dijksstra
             )
-            if(newNode.hCost < 0){
-              newNode.hCost = 0
-            }
+//            if(newNode.hCost < 0){
+//              newNode.hCost = 0
+//            }
             tempTran.head = newNode
             openNodeList = openNodeList ++ List(newNode)
           }
           closedNodeList.map{n =>
             if(!(closedNodeList contains n)){
-              if(n.fCost < examinedNode.fCost){
+              if(n.gCost < examinedNode.gCost){
                 examinedNode = n
               }
             }
