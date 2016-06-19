@@ -1,5 +1,3 @@
-#Albatross
-
 #Sequence Planner
 
 ##Backend
