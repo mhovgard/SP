@@ -1,3 +1,6 @@
+cache/
+.sbt.*
+lib_managed/
 target/
 bin/
 project/boot/
