@@ -30,13 +30,15 @@ This will take quite a while to do the first time. Start the container with
 
 
 ```
+docker run -i -t -v PATH_TO_YOUR_REPOSITORY/gui/web:/code -p 3000:3000 sp_web_dev
 ```
 
-Install all dependencies with
+Install all dependencies by entering the /code directory and running 
 ```
+npm install
 ```
 
-compile the code by tunning  
+compile the code by running  
 ```
 gulp build
 ```
