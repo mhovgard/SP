@@ -1,0 +1,60 @@
+@font-face {
+    font-family: clockFont;
+    src: url(/app/fonts/calc.ttf);
+}
+
+@font-face {
+    font-family: rounded;
+    src: url(/app/fonts/Comfortaa_Regular.ttf);
+}
+
+body{
+  background-color: #e6e6e6;
+}
+
+h2 {
+    clear: both;
+    margin:0;
+    padding-top: 20px;
+    padding-bottom: 10px;
+}
+
+/*the main big div!*/
+.placeholder{
+  margin:0 auto;
+  height:1080px;
+  width:100%;
+  max-width: 1920px;
+  /*width:1920px;*/
+  background-color: #e6e6e6;
+}
+
+.clock {
+  font-family: clockFont;
+  font-weight: 400;
+}
+
+#broken_data_notifier{
+  display:none;
+  width:50%;
+  height:50%;
+  position:absolute;
+  top:0px;
+  opacity: 1;
+  background-color: #ffa1ea;
+}
+
+table#clock_table{
+  text-align: center;
+  font-size:130px;
+  color: #424242;
+  line-height: 0%;
+  background-color:dark-gray;
+  border-color: #C2C2C2;
+  border-width: 3px;
+  border-style: solid;"
+  style="text-align:center;
+}
+  table#clock_table td{
+    width: 20%
+  }

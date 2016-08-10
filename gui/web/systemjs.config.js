@@ -9,7 +9,9 @@
     '@angular':                   'node_modules/@angular',
     'angular2-in-memory-web-api': 'node_modules/angular2-in-memory-web-api',
     'rxjs':                       'node_modules/rxjs',
-    'd3':                         'node_modules/d3/build/d3.js',
+    //wrong version
+    //'d3':                         'node_modules/d3/build/d3.js',
+    'd3':                         'node_modules/d3/d3.js',
     // ng2-bootstrap needs moment apparently
     'moment':                     'node_modules/moment/moment.js',
     'ng2-bootstrap':              'node_modules/ng2-bootstrap',
