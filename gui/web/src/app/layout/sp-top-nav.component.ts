@@ -18,20 +18,22 @@ export class SpTopNavComponent {
 
     showNavbar: boolean;
     togglePanelLock: void;
-    toggleNavbar: void;
+    toggleNavbar: () => void;
 
     activeModel: () => string;
     createModel: () => void;
     isState: () => boolean;
-    
+
     widgetKinds: WidgetKind[];
+
     addWidget: (widgetKind: any) => void;
     widgetKindTitle: string;
 
     normalView: () => void;
     compactView: () => void;
     maximizedContentView: () => void;
-    layoutEditorView: () => void;
+    enableEditorMode: () => void;
+    disableEditorMode: () => void;
 
     models: any;
     setActiveModel: (model: any) => void;
@@ -47,9 +49,17 @@ export class SpTopNavComponent {
         @Inject('settingsService') settingsService,
         private ng2DashboardService: Ng2DashboardService
     ) {
+
         this.showNavbar = themeService.showNavbar;
+
         this.togglePanelLock = settingsService.togglePanelLock;
-        this.toggleNavbar = settingsService.toggleNavbar;
+
+        this.showNavbar = true;
+        //this.toggleNavbar = themeService.toggleNavbar; // implement it like this when themeService is ng2
+        this.toggleNavbar = function() {
+            this.showNavbar = !this.showNavbar;
+            themeService.toggleNavbar();
+        };
 
         this.activeModel = () => modelService.activeModel ?
             modelService.activeModel.name : null;
@@ -66,26 +76,28 @@ export class SpTopNavComponent {
             modalInstance.result.then(function(chosenName) {
                 modelService.createModel(chosenName);
             });
-        }
-        
+        };
+
         // upg-note: ugly custom resolve function will be changed when
         // widgetListService is rewritten and returns a proper Promise
+
         //var thiz = this;
         //widgetListService.list(function(list) {
         //   thiz.widgetKinds = list;
-        //}); 
+        //});
         this.widgetKinds = widgetKinds;
 
-        this.addWidget = function(widgetKind: any) { 
+        this.addWidget = function(widgetKind: any) {
             ng2DashboardService.addWidget(
                 ng2DashboardService.storage.dashboards[0], widgetKind
             );
-        }
+        };
 
         this.normalView = themeService.normalView;
         this.compactView = themeService.compactView;
         this.maximizedContentView = themeService.maximizedContentView;
-        this.layoutEditorView = themeService.layoutEditorView;
+        this.enableEditorMode = themeService.enableEditorMode;
+        this.disableEditorMode = themeService.disableEditorMode;
 
         this.models = modelService.models;
         this.setActiveModel = modelService.setActiveModel;

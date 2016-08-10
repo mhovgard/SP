@@ -31,7 +31,7 @@
             gridsterOptions : {
                 outerMargin: false,
                 columns: 12,
-                swapping: true,
+                rowHeight: (window.innerHeight-50) / 8,
                 margins: [0,0],
                 floating: false,
                 pushing: false,
@@ -67,6 +67,7 @@
         function activate() {
 
         }
+
 
         function addDashboard(name) {
             var dashboard = {
@@ -131,7 +132,7 @@
             service.gridsterOptions.draggable.enabled = isLocked;
             service.gridsterOptions.resizable.enabled = isLocked;
         }
-        
+
         function setPanelMargins(margin){
             service.gridsterOptions.margins[0] = margin;
             service.gridsterOptions.margins[1] = margin;

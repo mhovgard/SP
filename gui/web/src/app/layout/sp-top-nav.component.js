@@ -20,7 +20,12 @@ var SpTopNavComponent = (function () {
         this.ng2DashboardService = ng2DashboardService;
         this.showNavbar = themeService.showNavbar;
         this.togglePanelLock = settingsService.togglePanelLock;
-        this.toggleNavbar = settingsService.toggleNavbar;
+        this.showNavbar = true;
+        //this.toggleNavbar = themeService.toggleNavbar; // implement it like this when themeService is ng2
+        this.toggleNavbar = function () {
+            this.showNavbar = !this.showNavbar;
+            themeService.toggleNavbar();
+        };
         this.activeModel = function () { return modelService.activeModel ?
             modelService.activeModel.name : null; };
         this.isState = $state.is;
@@ -39,7 +44,7 @@ var SpTopNavComponent = (function () {
         //var thiz = this;
         //widgetListService.list(function(list) {
         //   thiz.widgetKinds = list;
-        //}); 
+        //});
         this.widgetKinds = widget_kinds_1.widgetKinds;
         this.addWidget = function (widgetKind) {
             ng2DashboardService.addWidget(ng2DashboardService.storage.dashboards[0], widgetKind);
@@ -47,7 +52,8 @@ var SpTopNavComponent = (function () {
         this.normalView = themeService.normalView;
         this.compactView = themeService.compactView;
         this.maximizedContentView = themeService.maximizedContentView;
-        this.layoutEditorView = themeService.layoutEditorView;
+        this.enableEditorMode = themeService.enableEditorMode;
+        this.disableEditorMode = themeService.disableEditorMode;
         this.models = modelService.models;
         this.setActiveModel = modelService.setActiveModel;
         this.activeModelName = function () { return modelService.activeModel ?
