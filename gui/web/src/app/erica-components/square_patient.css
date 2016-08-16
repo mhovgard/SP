@@ -1,0 +1,148 @@
+/*container div styling*/
+.squarePatients {
+  float:left;
+  width:100%;
+  height:0%; /* 45% */
+  background-color: lightgray;
+}
+
+.waitingPatients {
+  float:left;
+  height:55%;
+}
+
+.otherPatients {
+  float:left;
+  clear:right;
+  height:55%;
+  border-left: solid gray 1px;
+}
+
+/*squarePatients grid*/
+.grid {
+  width: 100%;
+  height: 45%;
+  /* background-color: aquamarine; */
+}
+
+.grid .row{
+  margin: 0;
+  width:100%;
+}
+
+.grid .row .cell{
+  float:left;
+  height:100%;
+  padding: 0.15%;
+  /* border: gray solid 1px; */
+}
+
+/* square Patients*/
+  li.patientCard{
+    height: 100%;
+    width: 100%;
+    display: inline-block;
+  }
+
+ /*triage colors*/
+  li.patientCard.red{ background-color: #FF0000; }
+  li.patientCard.orange{ background-color: #FF8C00; }
+  li.patientCard.yellow{  background-color: #FFFF00; }
+  li.patientCard.green{ background-color: #5FCC00; }
+  li.patientCard.blue{ background-color: #0040FF; }
+  li.patientCard.white{ background-color: #ffffff; }
+
+  li.patientCard.attention{
+    box-shadow: 0px 0px 0px 5px black inset;
+    padding: 5px;
+  }
+  .patientCard p{
+    font-size: 200%;
+  }
+
+  .patientCard p.nameAndNumber{
+    float:right;
+    display: none;
+    text-align:right;
+    font-size:150%;
+    min-width:50%;
+  }
+
+  .patientCard.dummy{
+    background-color:#bfbfbf; /*gray*/
+    box-shadow: 0px 0px 0px 4px white inset;
+    border: gray 1px solid;
+  }
+
+    .patientCard.dummy p{
+      margin:0px;
+      padding:5%;
+      color: white;
+      font-weight:bold;
+    }
+
+    /*table styling*/
+  li.patientCard td{
+    border: 1px solid #b0b0b0;
+    //border-color: black;
+    width:50%;
+    padding:0px;
+    font-size:120%;
+    background-color:rgba(255,255,255,0.6);
+  }
+
+  .patientCard img.done{
+    display: block;
+    float:left;
+    padding-right:5px;
+    width: 28px;
+    height: 28px;
+    background: url(/app/icons/Done.svg);
+  }
+
+  .patientCard img.doctor{
+    display: block;
+    float:left;
+    margin-right: 5px;
+    width: 28px;
+    height: 28px;
+    background: url(/app/icons/Doctor.svg);
+  }
+
+  .patientCard img.waitClock{
+    display: block;
+    float:left;
+    margin-right: 5px;
+    width: 28px;
+    height: 28px;
+    background: url(/app/icons/Waiting_time.svg);
+  }
+
+  .patientCard img.arrivalClock{
+    display: block;
+    float:left;
+    margin-right: 5px;
+    width: 28px;
+    height: 28px;
+    background: url(/app/icons/Arrival_time.svg);
+  }
+
+
+/* patient waiting and others */
+ul.cardList{
+  float:left;
+  padding:0px;
+  margin:0px;
+}
+
+  .cardList li{
+    margin:0;
+    display:inline-block;
+    float:left;
+  }
+
+  .cardList li.headCard{
+    padding-left:5%;
+    font-size:200%;
+    font-weight:bold;
+  }

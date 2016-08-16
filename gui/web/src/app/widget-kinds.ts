@@ -5,6 +5,8 @@ import { MapComponent } from './erica-components/map.component';
 import { changeTable } from './erica-components/changeTable.component';
 import { barchart_coordinatorComponent } from './erica-components/barchart_coordinator.component';
 import { barchart_medicinComponent } from './erica-components/barchart_medicin.component';
+import { TrendDiagrams } from './erica-components/trend_diagrams/trend_diagrams.component';
+import { SquarePatients } from './erica-components/squarePatient.component';
 import {
     ItemEditorComponent,
     ItemExplorerComponent,
@@ -28,5 +30,7 @@ export const widgetKinds: WidgetKind[] = [
     { 'component': changeTable, 'title': 'ERICA Change Table', 'sizex': 4, 'sizey': 4, 'id': null, 'gridOptions': null },
     { 'component': barchart_coordinatorComponent, 'title': 'ERICA Bars Coord', 'sizex': 4, 'sizey': 4, 'id': null, 'gridOptions': null },
     { 'component': barchart_medicinComponent, 'title': 'ERICA Bars Med', 'sizex': 4, 'sizey': 4, 'id': null, 'gridOptions': null },
+    { 'component': TrendDiagrams, 'title': 'ERICA Trend Diagrams', 'sizex': 4, 'sizey': 4, 'id': null, 'gridOptions': null },
+    { 'component': SquarePatients, 'title': 'ERICA Square Patients', 'sizex': 4, 'sizey': 4, 'id': null, 'gridOptions': null },
     { 'component': KubInputGUIComponent, 'title': 'upg-kub', 'sizex': 4, 'sizey': 4, 'id': null, 'gridOptions': null }
 ]
