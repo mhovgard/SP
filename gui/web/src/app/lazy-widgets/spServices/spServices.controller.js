@@ -39,7 +39,6 @@
         }
 
         function startSPService(spService) {
-
             //Fill attributes with default values if spService directive has not been loaded.
             if(_.isUndefined(vm.serviceAttributes[spService.name])) {
                 vm.serviceAttributes[spService.name] = fillAttributes(spService.attributes,"");
@@ -47,6 +46,7 @@
             }
 
             spServicesService.callService(spService, {"data":vm.serviceAttributes[spService.name]}, resp, prog);
+
 
             if (!_.isUndefined(vm.currentProgess[event.service])){
                 delete vm.currentProgess[event.service];

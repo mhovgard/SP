@@ -10,7 +10,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var JsonNode_1 = require('./JsonNode');
-//import { ItemExplorerNodeComponent } from './explorer-node.component';
 var ItemExplorerNodeComponent = (function () {
     function ItemExplorerNodeComponent() {
     }

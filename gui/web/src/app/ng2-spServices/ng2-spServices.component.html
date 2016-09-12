@@ -1,0 +1,42 @@
+<div class="service-list">
+        <table>
+            <tbody *ngFor="let obj of vm.registeredServices">
+            <tr>
+                <td>
+                    <button type="button" class="btn btn-link" (click)="vm.showDetails[obj.name] = !vm.showDetails[obj.name]">
+                        <i *ngIf="!vm.showDetails[obj.name]" class="fa fa-plus"></i>
+                        <i *ngIf="vm.showDetails[obj.name]" class="fa fa-minus"></i>
+                    </button>
+
+                    <label>{{obj.name}}</label>
+                </td>
+                <td></td>
+                <td>
+                    <div class="pull-right btn-group" *ngIf="vm.servicesAreRunnable">
+                        <button type="button" class="btn btn-sm btn-primary" (click)="vm.startSpService(obj)">
+                            <i class="fa fa-play"></i> Run
+                        </button>
+                    </div>
+
+                    <label *ngIf="!vm.servicesAreRunnable">Not runnable, no model loaded</label>
+                    <!--<label *ngIf="vm.currentProgess[obj.name].type == 'Progress'">Loading</label>-->
+                </td>
+
+                <!--<td>{{obj.name}}</td>-->
+            </tr>
+            <tr *ngIf="vm.showDetails[obj.name]" ng-class-odd="'odd-row'" ng-class-even="'even-row'">
+                <td colspan="99">
+                    <!--Attribute att skicka:<br/>-->
+                    <!--{{vm.serviceAttributes[obj.name]}}-->
+                    <!--<sp-services-form attributes="vm.serviceAttributes[obj.name]" structure="obj.attributes"></sp-services-form>-->
+                    <ng2-spServicesInnerForm [vmVar]="vm" ></ng2-spServicesInnerForm>
+                </td>
+            </tr>
+
+            </tbody>
+
+        </table>
+</div>
+
+
+

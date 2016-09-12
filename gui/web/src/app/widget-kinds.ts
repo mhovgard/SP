@@ -2,6 +2,7 @@ import { WidgetKind } from './widget-kind';
 import { Faces } from './erica-components/faces.component';
 import { AwesomeNG2Component } from './lazy-widgets/ng2Inside/awesome-ng2-component.component';
 import { Ng2ItemExplorerComponent } from './lazy-widgets/ng2-item-explorer/explorer.component';
+import { Ng2SpServicesComponent } from './ng2-spServices/ng2-spServices.component'
 
 import {
     ItemEditorComponent,
@@ -21,6 +22,7 @@ import {
 
 export const widgetKinds: WidgetKind[] = [
     { 'component': Ng2ItemExplorerComponent, 'title': 'ng2-item-explorer', 'sizex': 20, 'sizey': 20, 'id': null, 'gridOptions': null },
+    { 'component': Ng2SpServicesComponent, 'title': 'sp Service List', 'sizex': 4, 'sizey': 4, 'id': null, 'gridOptions': null },
     { 'component': Faces, 'title': 'ERICA Faces test', 'sizex': 4, 'sizey': 4, 'id': null, 'gridOptions': null },
     { 'component': AwesomeNG2Component, 'title': 'ng2Inside', 'sizex': 4, 'sizey': 4, 'id': null, 'gridOptions': null },
     { 'component': ItemExplorerComponent, 'title': 'item-explorer', 'sizex': 4, 'sizey': 4, 'id': null, 'gridOptions': null },

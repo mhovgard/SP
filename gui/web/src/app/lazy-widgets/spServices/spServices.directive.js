@@ -6,7 +6,7 @@
 
     angular
         .module('app.spServices')
-        .directive('spServicesForm', spServicesForm);
+        .component('spServicesForm', spServicesForm);
 
     spServicesForm.$inject = ['$compile'];
     /* @ngInject */

@@ -31,8 +31,8 @@ var Ng2ItemExplorerService = (function () {
                 "woop": "floop"
             },
             I_AM_AN_ARRAY: [
-                { "oh": "shit" },
-                { "what": "up" }
+                { "an": "element" },
+                { "another": "element" }
             ]
         };
         this.currentModelSubject = new Subject_1.Subject();
