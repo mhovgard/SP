@@ -1,9 +1,30 @@
 <p>hejhjälp</p>
-<!--<table class="table drop-target" *NgIf="vm.isA == 'object'">
+<table class="table drop-target" *ngIf="vm != null && vm.isA == 'object'">
     <tr *ngFor="let key of vm.structure">
         <td>{{key}}</td>
-        <td><span attributes="vm.attributes[key]" structure="value" key="key"></span></td>
+        <!--<td><span <attributes="vm.attributes[key]" structure="value" key="key"></span></td>-->
     </tr>
-</table>-->
+</table>
 
 
+<!--Supported non-object isA-->
+<!--
+<div *ngIf="vm.isA == 'Option[ID]Model'">
+    <form role="form" name="form">
+        <div class="form-group">
+            <input type="text" name="input" class="form-control" ng-model="vm.attributes" ng-pattern="/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/"/>
+            <div role="alert">
+                <span class="error" ng-show="form.input.$error.pattern">
+                    Not an UUID!
+                </span>
+            </div>
+            <button class="btn btn-default" (click)="vm.attributes = vm.reloadModelID()">
+                <i class="fa fa-repeat"></i>
+                reload
+            </button>
+        </div>
+    </form>
+</div>
+
+
+-->

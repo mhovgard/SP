@@ -39,6 +39,7 @@ export function upgConvertStuff(upgAdapter: UpgradeAdapter): void {
     upgAdapter.upgradeNg1Provider('$ocLazyLoad');
     upgAdapter.upgradeNg1Provider('themeService');
     upgAdapter.upgradeNg1Provider('spServicesService');
+    upgAdapter.upgradeNg1Provider('itemService');
     upgAdapter.addProvider(Ng2DashboardService);
     upgAdapter.addProvider(ThemeService);
     upgAdapter.addProvider(EventBusService);
